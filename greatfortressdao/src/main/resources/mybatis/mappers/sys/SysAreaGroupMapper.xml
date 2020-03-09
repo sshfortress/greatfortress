@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sshfortress.dao.system.mapper.SysAreaGroupMapper" >
+  <resultMap id="BaseResultMap" type="com.sshfortress.common.beans.SysAreaGroup" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="group_name" property="groupName" jdbcType="VARCHAR" />
+    <result column="province_id" property="provinceId" jdbcType="VARCHAR" />
+    <result column="province_names" property="provinceNames" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, group_name, province_id, province_names
+  </sql>
+  
+  <!-- 返回区域分组的情况 -->
+  <resultMap id="AreaMap" type="com.sshfortress.common.model.GroupDto" >
+    
+    <id column="id" property="id"    />
+    <result column="group_name" property="groupName"  />
+    
+    <collection property="sad"  ofType="com.sshfortress.common.model.SysAreaDto">
+    <id column="area_id" property="id"  />
+    <result column="code" property="code"  />
+    <result column="name" property="name"  />
+    
+    </collection>
+    
+    
+  </resultMap>
+  
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_area_group
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from sys_area_group
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.sshfortress.common.beans.SysAreaGroup" >
+    insert into sys_area_group (id, group_name, province_id, 
+      province_names)
+    values (#{id,jdbcType=BIGINT}, #{groupName,jdbcType=VARCHAR}, #{provinceId,jdbcType=VARCHAR}, 
+      #{provinceNames,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.sshfortress.common.beans.SysAreaGroup" >
+    insert into sys_area_group
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="groupName != null" >
+        group_name,
+      </if>
+      <if test="provinceId != null" >
+        province_id,
+      </if>
+      <if test="provinceNames != null" >
+        province_names,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="groupName != null" >
+        #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="provinceId != null" >
+        #{provinceId,jdbcType=VARCHAR},
+      </if>
+      <if test="provinceNames != null" >
+        #{provinceNames,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.sshfortress.common.beans.SysAreaGroup" >
+    update sys_area_group
+    <set >
+      <if test="groupName != null" >
+        group_name = #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="provinceId != null" >
+        province_id = #{provinceId,jdbcType=VARCHAR},
+      </if>
+      <if test="provinceNames != null" >
+        province_names = #{provinceNames,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.sshfortress.common.beans.SysAreaGroup" >
+    update sys_area_group
+    set group_name = #{groupName,jdbcType=VARCHAR},
+      province_id = #{provinceId,jdbcType=VARCHAR},
+      province_names = #{provinceNames,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  
+  
+  <!-- 获取区域分组的情况  -->
+  <select id="selectAreaGroup" resultMap="AreaMap">
+  
+  select a.id,a.group_name,b.code,b.aname as name,b.id as area_id from sys_area_group a,sys_area b
+  where FIND_IN_SET(b.id,REPLACE(a.province_id,';',','))
+  and limit 0,1
+  </select>
+  
+  
+  <!-- 获取区域分组的情况  -->
+  <select id="getAreaGroup" resultType="java.util.Map">
+  
+  select id,group_name as groupName, province_id as provinceId,province_names as provinceNames from sys_area_group 
+  </select>
+  
+</mapper>

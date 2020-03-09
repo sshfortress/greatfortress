@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sshfortress.dao.system.mapper.EmailRegcodeMapper" >
+  <resultMap id="BaseResultMap" type="com.sshfortress.common.beans.EmailRegcode" >
+    <id column="email" property="email" jdbcType="VARCHAR" />
+    <result column="email_code" property="emailCode" jdbcType="VARCHAR" />
+    <result column="send_time" property="sendTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    email, email_code, send_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from email_regcode
+    where email = #{email,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from email_regcode
+    where email = #{email,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.sshfortress.common.beans.EmailRegcode" >
+    insert into email_regcode (email, email_code, send_time
+      )
+    values (#{email,jdbcType=VARCHAR}, #{emailCode,jdbcType=VARCHAR}, #{sendTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.sshfortress.common.beans.EmailRegcode" >
+    insert into email_regcode
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="email != null" >
+        email,
+      </if>
+      <if test="emailCode != null" >
+        email_code,
+      </if>
+      <if test="sendTime != null" >
+        send_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="emailCode != null" >
+        #{emailCode,jdbcType=VARCHAR},
+      </if>
+      <if test="sendTime != null" >
+        #{sendTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.sshfortress.common.beans.EmailRegcode" >
+    update email_regcode
+    <set >
+      <if test="emailCode != null" >
+        email_code = #{emailCode,jdbcType=VARCHAR},
+      </if>
+      <if test="sendTime != null" >
+        send_time = #{sendTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where email = #{email,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.sshfortress.common.beans.EmailRegcode" >
+    update email_regcode
+    set email_code = #{emailCode,jdbcType=VARCHAR},
+      send_time = #{sendTime,jdbcType=TIMESTAMP}
+    where email = #{email,jdbcType=VARCHAR}
+  </update>
+</mapper>

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sshfortress.dao.common.mapper.CommonMapper">
+
+	<insert id="addTest" parameterType="com.sshfortress.common.model.User"
+	useGeneratedKeys="true" keyProperty="id">
+	    insert into 
+	    test (name, phone,create_time)
+	    values 
+	    (#{name}, #{phone},now())
+  	</insert>
+  	
+	<insert id="addMsg" parameterType="com.sshfortress.common.websocket.Message"
+	useGeneratedKeys="true" keyProperty="id">
+	    insert into 
+	    test_msg (title, messageText,messageDate)
+	    values 
+	    (#{title}, #{messageText},#{messageDate})
+  	</insert>
+  	
+  	<!-- 最近一个月SSH用户登录数量统计图 -->
+  	<select id="getSSHLoginNameByMonth" resultType="java.lang.String">
+  		select
+		b.name
+		from
+		loginfailed_day a,
+		ssh_list b
+		where
+		<![CDATA[
+		SUBSTRING(a.audituser,1,(INSTR(a.audituser,'-')-1))=b.name
+		and CONCAT(DATE_FORMAT(DATE_ADD(NOW(),interval -1 month),'%Y-%m-%d'),' 00:00:00')<=a.time
+		and CONCAT(DATE_FORMAT(NOW(),'%Y-%m-%d'),' 23:59:59')>=a.time
+		]]>
+		group by b.name
+		order by b.name
+  	</select>
+  	
+  	<select id="getSSHLoginNumberByMonth" resultType="java.lang.Integer">
+  		select
+		COUNT(a.sid)
+		from
+		loginfailed_day a,
+		ssh_list b
+		where
+		<![CDATA[
+		SUBSTRING(a.audituser,1,(INSTR(a.audituser,'-')-1))=b.name
+		and CONCAT(DATE_FORMAT(DATE_ADD(NOW(),interval -1 month),'%Y-%m-%d'),' 00:00:00')<=a.time
+		and CONCAT(DATE_FORMAT(NOW(),'%Y-%m-%d'),' 23:59:59')>=a.time
+		]]>
+		group by b.name
+		order by b.name
+  	</select>
+  	
+  	<!-- 最近一周SSH用户登录数量统计图 -->
+  	<select id="getSSHLoginNameByWeek" resultType="java.util.Map">
+  		select
+		b.name sshName,
+		COUNT(a.sid) loginNumber
+		from
+		loginfailed_day a,
+		ssh_list b
+		where
+		<![CDATA[
+		SUBSTRING(a.audituser,1,(INSTR(a.audituser,'-')-1))=b.name
+		and CONCAT(DATE_FORMAT(DATE_ADD(NOW(),interval -1 week),'%Y-%m-%d'),' 00:00:00')<=a.time
+		and CONCAT(DATE_FORMAT(NOW(),'%Y-%m-%d'),' 23:59:59')>=a.time
+		]]>
+		group by b.name
+		order by b.name
+		limit 5
+  	</select>
+  	
+  	
+  	<!-- 获取国家相关信息 -->
+  	<select id="getCountryDetailByIp" parameterType="java.util.Map" resultType="com.sshfortress.common.model.DetailByCountry">
+  		select 
+  		IFNULL(country_cn,'') countryCn, 
+  		IFNULL(country_en,'') countryEn, 
+  		IFNULL(city, '')city,
+  		lat, 
+  		lon
+    	from 
+    	ip_place
+    	where 
+    	1=1
+    	<if test="countryCn !=null and countryCn !=''">
+	    	<![CDATA[
+	    	and INSTR(country_cn,#{countryCn})>0
+	    	]]>
+    	</if>
+    	<if test="city !=null and city !=''">
+	    	<![CDATA[
+	    	and INSTR(city,#{city})>0
+	    	]]>
+    	</if>
+    	<if test="countryEn !=null and countryEn !=''">
+	    	<![CDATA[
+	    	and INSTR(country_en,#{countryEn}) =1
+	    	]]>
+    	</if>
+    	limit 1
+    	
+  	</select>
+  	
+  	<!-- 查询当前登录IP的相关信息 -->
+  	<select id="getLoginIpDetail" resultType="java.util.Map" parameterType="java.util.Map">
+  		select
+		a.sourceip,
+		a.audituser userName,
+		a.Loginstate loginStatus,
+		a.time
+		from
+		loginfailed_day a
+		where 
+		a.sourceip=#{sourceIp}
+		order by a.sid desc
+		limit 1
+  	</select>
+	
+	<!-- 授权用户下拉框 -->
+	<select id="getUserList" parameterType="java.util.Map" resultType="java.util.Map">
+		select 
+		IFNULL(a.id,'') userId,
+		IFNULL(a.name,'') userName
+		from
+		ssh_list a
+		where
+		a.is_delete=0
+		order by CONVERT(a.name using gbk),a.id
+	</select>
+	
+	<!-- 资产下拉框 -->
+	<select id="getAssetPageList" parameterType="java.util.Map" resultType="java.util.Map">
+		select 
+		a.id assetId,
+		a.host_name hostName,
+		IFNULL(a.dst_ip,'') dstIp,
+		IFNULL(a.system_type,'') systemType
+		from
+		asset_list a
+		where
+		a.is_delete=0
+		<if test="searchText !=null and searchText !=''">
+			and INSTR(
+				CONCAT(IFNULL(a.host_name,''),
+				IFNULL(a.dst_ip,''),
+				4)
+			,#{searchText})>0
+		</if>
+		order by CONVERT(a.host_name using gbk),a.id
+	</select>
+	
+	<!-- 资产分组下拉框 -->
+	<select id="getAssetGroupList" parameterType="java.util.Map" resultType="java.util.Map">
+		select 
+		a.id groupId,
+		a.group_name groupName
+		from
+		asset_group a
+		where
+		a.is_delete=0
+		order by CONVERT(a.group_name using gbk),a.id
+	</select>
+	
+	<!-- 机房下拉框 -->
+	<select id="getIdcList" parameterType="java.util.Map" resultType="java.util.Map">
+		select 
+		a.id idcId,
+		a.idc_name idcName
+		from
+		idc_list a
+		where
+		a.is_delete=0
+		order by CONVERT(a.idc_name using gbk),a.id
+	</select>
+</mapper>

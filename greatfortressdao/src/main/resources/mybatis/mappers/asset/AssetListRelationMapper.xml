@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sshfortress.dao.asset.mapper.AssetListRelationMapper">
+  <resultMap id="BaseResultMap" type="com.sshfortress.common.entity.AssetListRelation">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="asset_group" jdbcType="BIGINT" property="assetGroup" />
+    <result column="asset_id" jdbcType="BIGINT" property="assetId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, asset_group, asset_id
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from asset_list_relation
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  
+  <!-- 通过资产查找资产组id -->
+  <select id="getAssetGroupIdByAssetId" parameterType="java.lang.Long" resultType="java.lang.Long">
+  	select asset_group assetGroupId from asset_list_relation where asset_id=#{assetId}
+  </select>
+  
+  <!-- 通过资产组id查找资产id -->
+  <select id="getAssetIdByAssetGroupId" parameterType="java.lang.Long" resultType="java.lang.Long">
+  	select asset_id assetGroupId from asset_list_relation where asset_group=#{assetGroupId}
+  </select>
+  
+  <!-- 删除资产时解绑关系 -->
+  <delete id="unbundlingByDelAsset" parameterType="java.lang.Long">
+    delete from asset_list_relation
+    where asset_id = #{assetId}
+  </delete>
+  
+  <!-- 删除资产分组时解绑关系 -->
+  <delete id="unbundlingByDelAssetGroup" parameterType="java.lang.Long">
+    delete from asset_list_relation
+    where asset_group = #{assetGroupId}
+  </delete>
+  
+   <!-- 增加资产时批量增加资产分组 -->
+  <insert id="addAssetGroupRelationByBatch" parameterType="com.sshfortress.common.entity.AssetListRelation">
+    insert into 
+    asset_list_relation (asset_group, asset_id)
+    values 
+    <foreach collection="list" item="item" separator=",">
+    (#{item.assetGroup}, #{item.assetId})
+    </foreach>
+  </insert>
+  
+  
+  <insert id="insert" parameterType="com.sshfortress.common.entity.AssetListRelation">
+    insert into asset_list_relation (id, asset_group, asset_id
+      )
+    values (#{id,jdbcType=BIGINT}, #{assetGroup,jdbcType=BIGINT}, #{assetId,jdbcType=BIGINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.sshfortress.common.entity.AssetListRelation">
+    insert into asset_list_relation
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="assetGroup != null">
+        asset_group,
+      </if>
+      <if test="assetId != null">
+        asset_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="assetGroup != null">
+        #{assetGroup,jdbcType=BIGINT},
+      </if>
+      <if test="assetId != null">
+        #{assetId,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.sshfortress.common.entity.AssetListRelation">
+    update asset_list_relation
+    <set>
+      <if test="assetGroup != null">
+        asset_group = #{assetGroup,jdbcType=BIGINT},
+      </if>
+      <if test="assetId != null">
+        asset_id = #{assetId,jdbcType=BIGINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.sshfortress.common.entity.AssetListRelation">
+    update asset_list_relation
+    set asset_group = #{assetGroup,jdbcType=BIGINT},
+      asset_id = #{assetId,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

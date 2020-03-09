@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sshfortress.dao.asset.mapper.AssetGroupMapper">
+  <resultMap id="BaseResultMap" type="com.sshfortress.common.entity.AssetGroup">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="group_name" jdbcType="VARCHAR" property="groupName" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
+    <result column="creator" jdbcType="VARCHAR" property="creator" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, group_name, remark, create_time, update_time, is_delete, creator
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from asset_group
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from asset_group
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  
+  <!-- 资产组下拉框 -->
+  <select id="assetGroupList" resultType="com.sshfortress.common.model.ListByAssetGroup">
+  	select id assetGroupId, group_name assetGroupName from asset_group where is_delete=0
+  </select>
+  
+  <!-- 资产分组分页列表 -->
+  <select id="getAssetGroupPageList" parameterType="java.util.Map" resultType="com.sshfortress.common.model.PageListByAssetGroup">
+  	select 
+	a.group_name groupName,
+	a.id assetGroupId,
+	IFNULL(a.remark,'')remark,
+	(select COUNT(h.id) from asset_list_relation h where h.asset_group=a.id)assetNumber
+	from
+	asset_group a
+	where a.is_delete=0
+	<if test=" searchText !=null and searchText !='' ">
+		and INSTR(
+				CONCAT(IFNULL(a.group_name,''),
+					   IFNULL(a.remark,''),
+				       (select COUNT(h.id) from asset_list_relation h where h.asset_group=a.id)
+	      			  )
+				,#{searchText})>0
+	</if>
+	order by a.create_time desc,a.id
+  </select>
+  
+  <!-- 资产分组详情 -->
+  <resultMap id="get_Asset_Detail" type="com.sshfortress.common.model.DetailByAssetGroup">
+		<id 	column="id"  			property="assetGroupId" />
+    	<result column="group_name"  	property="groupName" />
+    	<result column="remark"  		property="remark" />
+
+		<collection property="assetList" ofType="com.sshfortress.common.model.ListByAsset"
+			select="getAssetList" column="{assetGroupId=id}">
+		</collection>
+
+	</resultMap>
+  
+  <select id="getAssetGroupDetail" resultMap="get_Asset_Detail" parameterType="java.util.Map">
+  	select
+  	a.id,
+	IFNULL(a.group_name,'') group_name, 
+	IFNULL(a.remark,'') remark
+	from
+	asset_group a
+	where
+	a.is_delete=0
+	and a.id=#{assetGroupId}
+  </select>
+  
+  <select id="getAssetList" parameterType="java.util.Map" resultType="com.sshfortress.common.model.ListByAsset">
+  	select 
+  	(select h.host_name from asset_list h where h.id=a.asset_id)hostName,
+  	(select h.dst_ip from asset_list h where h.id=a.asset_id)dstIp,
+  	a.asset_id assetId,
+  	IFNULL((select h.system_type from asset_list h where h.id=a.asset_id),'') systemType
+  	from 
+  	asset_list_relation a
+  	where asset_group=#{assetGroupId}
+  	order by CONVERT((select h.host_name from asset_list h where h.id=a.asset_id) using gbk),a.id
+  </select>
+  
+  <!-- 资产组名是否已存在 -->
+  <select id="isExistName" parameterType="java.util.Map" resultType="java.lang.String">
+  	select group_name from asset_group where is_delete=0 and group_name=#{groupName}
+  </select>
+  
+  <insert id="insert" parameterType="com.sshfortress.common.entity.AssetGroup">
+    insert into asset_group (id, group_name, remark, 
+      create_time, update_time, is_delete, 
+      creator)
+    values (#{id,jdbcType=BIGINT}, #{groupName,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{isDelete,jdbcType=INTEGER}, 
+      #{creator,jdbcType=VARCHAR})
+  </insert>
+  
+  <!-- 增加 -->
+  <insert id="addAssetGroup" parameterType="com.sshfortress.common.entity.AssetGroup"
+  	useGeneratedKeys="true" keyProperty="id">
+    insert into asset_group
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="groupName != null">
+        group_name,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="isDelete != null">
+        is_delete,
+      </if>
+      <if test="creator != null">
+        creator,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="groupName != null">
+        #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isDelete != null">
+        #{isDelete,jdbcType=INTEGER},
+      </if>
+      <if test="creator != null">
+        #{creator,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <!-- 更新 -->
+  <update id="updateAssetGroup" parameterType="com.sshfortress.common.entity.AssetGroup">
+    update asset_group
+    <set>
+      <if test="groupName != null">
+        group_name = #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isDelete != null">
+        is_delete = #{isDelete,jdbcType=INTEGER},
+      </if>
+      <if test="creator != null">
+        creator = #{creator,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.sshfortress.common.entity.AssetGroup">
+    update asset_group
+    set group_name = #{groupName,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      is_delete = #{isDelete,jdbcType=INTEGER},
+      creator = #{creator,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

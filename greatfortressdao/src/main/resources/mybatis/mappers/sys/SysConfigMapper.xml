@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sshfortress.dao.system.mapper.SysConfigMapper" >
+  <resultMap id="BaseResultMap" type="com.sshfortress.common.beans.SysConfig" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="config_name" property="configName" jdbcType="VARCHAR" />
+    <result column="group_code" property="groupCode" jdbcType="VARCHAR" />
+    <result column="ckey" property="ckey" jdbcType="VARCHAR" />
+    <result column="cvalue" property="cvalue" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap id="AllBaseResultMap" type="java.util.Map" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="config_name" property="configName" jdbcType="VARCHAR" />
+    <result column="group_code" property="groupCode" jdbcType="VARCHAR" />
+    <result column="ckey" property="ckey" jdbcType="VARCHAR" />
+    <result column="cvalue" property="cvalue" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    id, config_name, group_code, ckey, cvalue, remark
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_config
+    where id = #{id}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from sys_config
+    where id = #{id}
+  </delete>
+  <insert id="insert" parameterType="com.sshfortress.common.beans.SysConfig" >
+    insert into sys_config (id, config_name, group_code, 
+      ckey, cvalue, remark
+      )
+    values (#{id}, #{configName}, #{groupCode}, 
+      #{ckey}, #{cvalue}, #{remark}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.sshfortress.common.beans.SysConfig" >
+    insert into sys_config
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="configName != null" >
+        config_name,
+      </if>
+      <if test="groupCode != null" >
+        group_code,
+      </if>
+      <if test="ckey != null" >
+        ckey,
+      </if>
+      <if test="cvalue != null" >
+        cvalue,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id},
+      </if>
+      <if test="configName != null" >
+        #{configName},
+      </if>
+      <if test="groupCode != null" >
+        #{groupCode},
+      </if>
+      <if test="ckey != null" >
+        #{ckey},
+      </if>
+      <if test="cvalue != null" >
+        #{cvalue},
+      </if>
+      <if test="remark != null" >
+        #{remark},
+      </if>
+    </trim>
+  </insert>
+  
+  <!-- 更新配置的值 -->
+  <update id="updateCvalueByCkey" parameterType="com.sshfortress.common.beans.SysConfig" >
+    update sys_config
+    <set >
+      <if test="cvalue != null" >
+        cvalue = #{cvalue},
+      </if>
+    </set>
+    where ckey = #{ckey}
+  </update>
+  
+  <!-- 查询配置的值 -->
+  <select id="getCvalueByCkey" parameterType="java.lang.String" resultType="java.lang.String">
+  	select IFNULL(cvalue,'') cvalue from sys_config where ckey = #{ckey}
+  </select>
+  
+  <update id="updateByPrimaryKey" parameterType="com.sshfortress.common.beans.SysConfig" >
+    update sys_config
+    set config_name = #{configName},
+      group_code = #{groupCode},
+      ckey = #{ckey},
+      cvalue = #{cvalue},
+      remark = #{remark}
+    where id = #{id}
+  </update>
+  
+  <select id="selectGroupCodeByCkey" resultType="java.lang.String" parameterType="java.util.Map">
+  	select group_code from sys_config where  ckey = #{ckey}
+  </select>
+  
+  
+    <select id="selectKeyValueByGroupCode" resultType="com.sshfortress.common.beans.SysConfigKeyValue" parameterType="java.util.Map">
+    <![CDATA[ 
+     	select ckey, cvalue from sys_config where  group_code = #{groupCode}
+    ]]>
+  </select>
+  
+  <!-- 获取配置文件的情况 -->
+  <select id="selectByAll" resultMap="AllBaseResultMap">
+  SELECT id,ckey,cvalue,group_code,config_name FROM sys_config
+  where ckey is not null and cvalue is not null
+  </select>
+    
+</mapper>

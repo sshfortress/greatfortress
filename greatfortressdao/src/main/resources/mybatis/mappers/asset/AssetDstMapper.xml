@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sshfortress.dao.asset.mapper.AssetDstMapper">
+  <resultMap id="BaseResultMap" type="com.sshfortress.common.entity.AssetDst">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="asset_id" jdbcType="BIGINT" property="assetId" />
+    <result column="dst_name" jdbcType="VARCHAR" property="dstName" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.sshfortress.common.entity.AssetDst">
+    <result column="dst_password" jdbcType="LONGVARBINARY" property="dstPassword" />
+  </resultMap>
+  
+  <!-- 删除某个目标 -->
+  <delete id="delDstByDstId" parameterType="java.lang.Long">
+  	delete from asset_dst where id=#{dstId}
+  </delete>
+  
+  <!-- 查询某个资产组下除了某个资产及某个用户名以外的用户名集合 -->
+  <select id="getDstListByExceptAssetIdDstName"  resultType="java.lang.Long" parameterType="java.util.Map">
+  		select
+		a.id dstId
+		from
+		asset_dst a,
+		asset_list_relation b,
+		asset_list c
+		where
+		a.asset_id=b.asset_id
+		and b.asset_id=c.id
+		and c.id!=#{assetId}
+		and a.dst_name=#{dstName}
+		and b.asset_group=#{assetGroupId}
+  </select>
+  
+  <!-- 目标用户下拉框 -->
+  <select id="dstListByAssetGroupId" parameterType="java.lang.Long" resultType="com.sshfortress.common.model.ListByDst">
+  	select
+	a.id dstId,
+	a.asset_id assetId,
+	a.dst_name dstName
+	from
+	asset_dst a,
+	asset_list_relation b,
+	asset_list c
+	where
+	a.asset_id=b.asset_id
+	and b.asset_id=c.id
+	and b.asset_group=#{assetGroupId}
+	group by a.dst_name
+  </select>
+  
+  <!-- 批量增加资产的目标用户名和目标密码 -->
+  <insert id="addAssetDstNamePsdByBatch" parameterType="com.sshfortress.common.entity.AssetDst">
+    insert into asset_dst ( asset_id, dst_name, dst_password)
+    values 
+    <foreach collection="list" item="item" separator=",">
+    (#{item.assetId}, #{item.dstName}, AES_ENCRYPT(#{item.dstPassword},fun_getDictName('AESPrivateKey',10)))
+    </foreach>
+  </insert>
+  
+  <!-- 先删除再增加 -->
+  <delete id="delAssetDstByAssetId" parameterType="java.lang.Long">
+  	delete from asset_dst where asset_id=#{assetId}
+  </delete>
+  
+  <!-- 查询某个资产下的所有目标用户名和密码 -->
+  <select id="getDstNamePsdListByAssetId" parameterType="java.lang.Long" resultType="com.sshfortress.common.model.DstListByAssetId">
+  	select 
+  	id dstId,
+  	dst_name dstName, 
+  	IFNULL(AES_DECRYPT(dst_password,fun_getDictName('AESPrivateKey','10')),'') dstPassword 
+  	from 
+  	asset_dst
+  	where 
+  	asset_id=#{assetId}
+  </select>
+  
+  <sql id="Base_Column_List">
+    id, asset_id, dst_name
+  </sql>
+  <sql id="Blob_Column_List">
+    dst_password
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from asset_dst
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from asset_dst
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.sshfortress.common.entity.AssetDst">
+    insert into asset_dst (id, asset_id, dst_name, 
+      dst_password)
+    values (#{id,jdbcType=BIGINT}, #{assetId,jdbcType=BIGINT}, #{dstName,jdbcType=VARCHAR}, 
+      #{dstPassword,jdbcType=LONGVARBINARY})
+  </insert>
+  <insert id="insertSelective" parameterType="com.sshfortress.common.entity.AssetDst">
+    insert into asset_dst
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="assetId != null">
+        asset_id,
+      </if>
+      <if test="dstName != null">
+        dst_name,
+      </if>
+      <if test="dstPassword != null">
+        dst_password,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="assetId != null">
+        #{assetId,jdbcType=BIGINT},
+      </if>
+      <if test="dstName != null">
+        #{dstName,jdbcType=VARCHAR},
+      </if>
+      <if test="dstPassword != null">
+        AES_ENCRYPT(#{dstPassword},fun_getDictName('AESPrivateKey',10)),
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.sshfortress.common.entity.AssetDst">
+    update asset_dst
+    <set>
+      <if test="assetId != null">
+        asset_id = #{assetId,jdbcType=BIGINT},
+      </if>
+      <if test="dstName != null">
+        dst_name = #{dstName,jdbcType=VARCHAR},
+      </if>
+      <if test="dstPassword != null">
+        dst_password = AES_ENCRYPT(#{dstPassword},fun_getDictName('AESPrivateKey',10)),
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.sshfortress.common.entity.AssetDst">
+    update asset_dst
+    set asset_id = #{assetId,jdbcType=BIGINT},
+      dst_name = #{dstName,jdbcType=VARCHAR},
+      dst_password = #{dstPassword,jdbcType=LONGVARBINARY}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.sshfortress.common.entity.AssetDst">
+    update asset_dst
+    set asset_id = #{assetId,jdbcType=BIGINT},
+      dst_name = #{dstName,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sshfortress.dao.asset.mapper.AssetListMapper">
+  <resultMap id="BaseResultMap" type="com.sshfortress.common.entity.AssetList">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="host_name" jdbcType="VARCHAR" property="hostName" />
+    <result column="dst_ip" jdbcType="VARCHAR" property="dstIp" />
+    <result column="ssh_port" jdbcType="INTEGER" property="sshPort" />
+    <result column="system_type" jdbcType="VARCHAR" property="systemType" />
+    <result column="asset_environment" jdbcType="INTEGER" property="assetEnvironment" />
+    <result column="idc_id" jdbcType="BIGINT" property="idcId" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
+    <result column="creator" jdbcType="VARCHAR" property="creator" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, host_name, dst_ip, dst_name, ssh_port, system_type,is_enable,
+    asset_environment, idc_id, remark, create_time, update_time, is_delete, creator
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from asset_list
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from asset_list
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  
+  <!-- 资产下拉框 -->
+  <select id="assetListByAssetGroupId" resultType="java.util.Map" parameterType="java.lang.Long">
+  	select 
+  	asset_id assetId,
+  	(select h.host_name from asset_list h where h.id=a.asset_id) assetName
+  	from 
+  	asset_list_relation a
+  	where asset_group=#{assetGroupId}
+  	order by 
+  	CONVERT((select h.host_name from asset_list h where h.id=a.asset_id) using gbk),a.id
+  </select>
+  
+  <!-- 资产名是否已存在 -->
+  <select id="isExistName" parameterType="java.util.Map" resultType="java.lang.String">
+  	select host_name from asset_list where is_delete=0 and host_name=#{hostName}
+  </select>
+  
+  <!-- 资产分页列表 -->
+  <select id="getAssetPageList" parameterType="java.util.Map" resultType="com.sshfortress.common.model.PageListByAsset">
+  	select 
+	a.id assetId,
+	a.host_name hostName,
+	a.dst_ip dstIp,
+	(select h.dvalue from sys_dictionary h where h.dflag='assetEnvironment' and h.dkey=a.asset_environment)assetEnvironment,
+	IFNULL(a.system_type,'') systemType
+	from 
+	asset_list a
+	where
+	a.is_delete=0
+	<if test=" searchText !=null and searchText !='' ">
+		and INSTR(CONCAT(
+						IFNULL(a.host_name,''),
+						IFNULL(a.dst_ip,''),
+						IFNULL(a.ssh_port,''),
+						IFNULL(a.system_type,''),
+						IFNULL((select h.dvalue from sys_dictionary h where h.dflag='assetEnvironment' and h.dkey=a.asset_environment),'')
+						)
+			,#{searchText})>0
+	</if>
+	order by a.create_time desc,a.id
+  </select>
+  
+  <!-- 资产详情 -->
+  <resultMap id="get_Asset_Detail" type="com.sshfortress.common.model.DetailByAsset">
+		<id 	column="id"  				property="assetId" />
+	    <result column="host_name"  		property="hostName" />
+	    <result column="dst_ip"  			property="dstIp" />
+	    <result column="ssh_port"  			property="sshPort" />
+	    <result column="system_type"  		property="systemType" />
+	    <result column="asset_environment"  property="assetEnvironment" />
+	    <result column="idc_id"  			property="idcId" />
+	    <result column="remark"  			property="remark" />
+
+		<collection property="assetGroupList" ofType="com.sshfortress.common.model.ListByAssetGroup"
+			select="getAssetGroupList" column="{assetId=id}">
+		</collection>
+
+	</resultMap>
+  
+  <select id="getAssetDetail" resultMap="get_Asset_Detail" parameterType="java.util.Map">
+  	select
+  	a.id,
+	IFNULL(a.host_name,'') host_name, 
+	IFNULL(a.dst_ip,'') dst_ip, 
+	IFNULL(a.ssh_port,'') ssh_port, 
+	IFNULL(a.system_type,'') system_type, 
+    IFNULL(a.asset_environment,'') asset_environment, 
+    IFNULL(a.idc_id,'') idc_id, 
+	IFNULL(a.remark,'')remark
+	from
+	asset_list a
+	where
+	a.is_delete=0
+	and a.id=#{assetId}
+  </select>
+  
+  <select id="getAssetGroupList" parameterType="java.util.Map" resultType="com.sshfortress.common.model.ListByAssetGroup">
+  	select 
+  	asset_group assetGroupId,
+  	(select h.group_name from asset_group h where h.id=a.asset_group) assetGroupName
+  	from asset_list_relation a
+  	where asset_id=#{assetId}
+  	order by CONVERT((select h.group_name from asset_group h where h.id=a.asset_group) using gbk),a.id
+  </select>
+  
+  <insert id="insert" parameterType="com.sshfortress.common.entity.AssetList">
+    insert into asset_list (id, host_name, dst_ip, 
+       ssh_port, system_type, 
+      asset_environment, idc_id, remark, 
+        create_time, 
+      update_time, is_delete, creator)
+    values (#{id,jdbcType=BIGINT}, #{hostName,jdbcType=VARCHAR}, #{dstIp,jdbcType=VARCHAR}, 
+       #{sshPort,jdbcType=INTEGER}, #{systemType,jdbcType=VARCHAR}, 
+      #{assetEnvironment,jdbcType=INTEGER}, #{idcId,jdbcType=BIGINT}, #{remark,jdbcType=VARCHAR}, 
+       #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{isDelete,jdbcType=INTEGER}, #{creator,jdbcType=VARCHAR})
+  </insert>
+  
+  <!-- 添加资产 -->
+  <insert id="addAsset" parameterType="com.sshfortress.common.entity.AssetList"
+  	useGeneratedKeys="true" keyProperty="id">
+    insert into asset_list
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="hostName != null">
+        host_name,
+      </if>
+      <if test="dstIp != null">
+        dst_ip,
+      </if>
+      <if test="sshPort != null">
+        ssh_port,
+      </if>
+      <if test="systemType != null">
+        system_type,
+      </if>
+      <if test="assetEnvironment != null">
+        asset_environment,
+      </if>
+      <if test="idcId != null">
+        idc_id,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="isDelete != null">
+        is_delete,
+      </if>
+      <if test="creator != null">
+        creator,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="hostName != null">
+        #{hostName,jdbcType=VARCHAR},
+      </if>
+      <if test="dstIp != null">
+        #{dstIp,jdbcType=VARCHAR},
+      </if>
+      <if test="sshPort != null">
+        #{sshPort,jdbcType=INTEGER},
+      </if>
+      <if test="systemType != null">
+        #{systemType,jdbcType=VARCHAR},
+      </if>
+      <if test="assetEnvironment != null">
+        #{assetEnvironment,jdbcType=INTEGER},
+      </if>
+      <if test="idcId != null">
+        #{idcId,jdbcType=BIGINT},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isDelete != null">
+        #{isDelete,jdbcType=INTEGER},
+      </if>
+      <if test="creator != null">
+        #{creator,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <!-- 更新资产 -->
+  <update id="updateAsset" parameterType="com.sshfortress.common.entity.AssetList">
+    update asset_list
+    <set>
+      <if test="hostName != null">
+        host_name = #{hostName,jdbcType=VARCHAR},
+      </if>
+      <if test="dstIp != null">
+        dst_ip = #{dstIp,jdbcType=VARCHAR},
+      </if>
+      <if test="sshPort != null">
+        ssh_port = #{sshPort,jdbcType=INTEGER},
+      </if>
+      <if test="systemType != null">
+        system_type = #{systemType,jdbcType=VARCHAR},
+      </if>
+      <if test="assetEnvironment != null">
+        asset_environment = #{assetEnvironment,jdbcType=INTEGER},
+      </if>
+      <if test="idcId != null">
+        idc_id = #{idcId,jdbcType=BIGINT},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isDelete != null">
+        is_delete = #{isDelete,jdbcType=INTEGER},
+      </if>
+      <if test="creator != null">
+        creator = #{creator,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.sshfortress.common.entity.AssetList">
+   update asset_list
+    set host_name = #{hostName,jdbcType=VARCHAR},
+      dst_ip = #{dstIp,jdbcType=VARCHAR},
+      ssh_port = #{sshPort,jdbcType=INTEGER},
+      system_type = #{systemType,jdbcType=VARCHAR},
+      asset_environment = #{assetEnvironment,jdbcType=INTEGER},
+      idc_id = #{idcId,jdbcType=BIGINT},
+      remark = #{remark,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      is_delete = #{isDelete,jdbcType=INTEGER},
+      creator = #{creator,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

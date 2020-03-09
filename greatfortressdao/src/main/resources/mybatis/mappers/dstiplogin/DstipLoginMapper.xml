@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sshfortress.dao.dstip.mapper.DstipLoginMapper">
+  <resultMap id="BaseResultMap" type="com.sshfortress.common.entity.DstipLogin">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="dst_ip" jdbcType="VARCHAR" property="dstIp" />
+    <result column="country_cn" jdbcType="VARCHAR" property="countryCn" />
+    <result column="country_en" jdbcType="VARCHAR" property="countryEn" />
+    <result column="city" jdbcType="VARCHAR" property="city" />
+    <result column="lon" jdbcType="VARCHAR" property="lon" />
+    <result column="lat" jdbcType="VARCHAR" property="lat" />
+    <result column="login_status" jdbcType="INTEGER" property="loginStatus" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="user_group" jdbcType="BIGINT" property="userGroup" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.sshfortress.common.entity.DstipLogin">
+    <result column="remark" jdbcType="LONGVARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, dst_ip, country_cn, country_en, city, lon, lat, login_status, user_id, user_group, 
+    create_time,update_time
+  </sql>
+  <sql id="Blob_Column_List">
+    remark
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from dstip_login
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from dstip_login
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.sshfortress.common.entity.DstipLogin">
+    insert into dstip_login (id, dst_ip, country_cn, 
+      country_en, city, lon, 
+      lat, login_status, user_id, 
+      user_group, create_time, remark,update_time
+      )
+    values (#{id,jdbcType=BIGINT}, #{dstIp,jdbcType=VARCHAR}, #{countryCn,jdbcType=VARCHAR}, 
+      #{countryEn,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, #{lon,jdbcType=VARCHAR}, 
+      #{lat,jdbcType=VARCHAR}, #{loginStatus,jdbcType=INTEGER}, #{userId,jdbcType=VARCHAR}, 
+      #{userGroup,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=LONGVARCHAR},#{updateTime}
+      )
+  </insert>
+  
+  <!-- 最新登录的3条IP -->
+  <select id="getNewLoginIPList" resultType="java.util.Map">
+  	select
+	a.dst_ip IP,
+	DATE_FORMAT(a.update_time,'%Y-%m-%d %T')createTime,
+	a.login_status loginStatus
+	from
+	dstip_login a
+	where
+	1=1
+	<![CDATA[
+	and DATE_FORMAT(update_time,'%Y-%m-%d %T')>=CONCAT(DATE_FORMAT(now(),'%Y-%m-%d'),' 00:00:00')
+	and DATE_FORMAT(update_time,'%Y-%m-%d %T')<=CONCAT(DATE_FORMAT(now(),'%Y-%m-%d'),' 23:59:59')
+	]]>
+	group by a.dst_ip
+	order by a.update_time desc
+	limit 3
+  </select>
+  
+  <!-- 当前登录用户数量 -->
+  <select id="getNowLoginIpNumber" resultType="java.lang.Integer">
+  	select
+	COUNT(a.id)
+	from
+	dstip_login a
+	where
+	a.login_status=1
+	<![CDATA[
+	and DATE_FORMAT(update_time,'%Y-%m-%d %T')>=CONCAT(DATE_FORMAT(now(),'%Y-%m-%d'),' 00:00:00')
+	and DATE_FORMAT(update_time,'%Y-%m-%d %T')<=CONCAT(DATE_FORMAT(now(),'%Y-%m-%d'),' 23:59:59')
+	]]>
+  </select>
+  
+  <!-- 查询主机数 -->
+  <select id="getHostNumber" resultType="java.lang.Integer">
+  	select COUNT(id) from asset_list where is_delete=0
+  </select>
+  
+  <!-- 查询某段时间的登录用户集合(默认一天内) -->
+  <select id="getLoginDstIpListByNow" resultType="com.sshfortress.common.model.ListByLoginDstIp" parameterType="java.util.Map">
+  	select
+  	country_cn countryCn, 
+  	country_en countryEn, 
+  	city, 
+  	lon, 
+  	lat
+  	from
+  	dstip_login
+  	where
+  	login_status !=2
+  	<if test="nowTime !=null and nowTime !=''">
+  		<![CDATA[
+	  	and CONCAT(DATE_FORMAT(NOW(),'%Y-%m-%d'),' 00:00:00')<=update_time
+		and update_time<=CONCAT(DATE_FORMAT(NOW(),'%Y-%m-%d'),' 23:59:59')
+  		]]>
+  	</if>
+  	<if test="minTime !=null and minTime !=''">
+  		<![CDATA[
+  		and DATE_FORMAT(update_time,'%Y-%m-%d %T')>=CONCAT(#{minTime},' 00:00:00')
+  		]]>
+  	</if>
+  	<if test="maxTime !=null and maxTime !=''">
+  		<![CDATA[
+  		and DATE_FORMAT(update_time,'%Y-%m-%d %T')<=CONCAT(#{maxTime},' 23:59:59')
+  		]]>
+  	</if>
+  	
+  </select>
+  
+  <!-- 查询某段时间内某个国家/城市登录的数量 -->
+  <select id="getLoginDstIpNumberBycountry" resultType="java.lang.Integer" parameterType="java.util.Map">
+  	select
+  	IF(login_status>0,COUNT(id),0-COUNT(id))countNumber
+  	from
+  	dstip_login
+  	where
+  	login_status !=2
+  	and INSTR(country_cn,#{countryCn})>0
+  	<if test="loginCity !=null and loginCity !=''">
+  		and INSTR(city,#{loginCity})>0
+  	</if>
+  	<if test="nowTime !=null and nowTime !=''">
+  		<![CDATA[
+	  	and CONCAT(DATE_FORMAT(NOW(),'%Y-%m-%d'),' 00:00:00')<=update_time
+		and update_time<=CONCAT(DATE_FORMAT(NOW(),'%Y-%m-%d'),' 23:59:59')
+  		]]>
+  	</if>
+  	<if test="minTime !=null and minTime !=''">
+  		<![CDATA[
+  		and DATE_FORMAT(update_time,'%Y-%m-%d %T')>=CONCAT(#{minTime},' 00:00:00')
+  		]]>
+  	</if>
+  	<if test="maxTime !=null and maxTime !=''">
+  		<![CDATA[
+  		and DATE_FORMAT(update_time,'%Y-%m-%d %T')<=CONCAT(#{maxTime},' 23:59:59')
+  		]]>
+  	</if>
+  </select>
+  
+  <!-- 查询是否存在 -->
+  <select id="isExistDstIpLogin" parameterType="java.util.Map" resultType="java.lang.Long">
+  	select id from dstip_login where dst_ip=#{dstIp}
+  </select>
+  
+  <!-- 增加dst_ip登录信息 -->
+  <insert id="addDstIpLogin" parameterType="com.sshfortress.common.entity.DstipLogin"
+  	useGeneratedKeys="true" keyProperty="id">
+    insert into dstip_login
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="dstIp != null">
+        dst_ip,
+      </if>
+      <if test="countryCn != null">
+        country_cn,
+      </if>
+      <if test="countryEn != null">
+        country_en,
+      </if>
+      <if test="city != null">
+        city,
+      </if>
+      <if test="lon != null">
+        lon,
+      </if>
+      <if test="lat != null">
+        lat,
+      </if>
+      <if test="loginStatus != null">
+        login_status,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="userGroup != null">
+        user_group,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="dstIp != null">
+        #{dstIp,jdbcType=VARCHAR},
+      </if>
+      <if test="countryCn != null">
+        #{countryCn,jdbcType=VARCHAR},
+      </if>
+      <if test="countryEn != null">
+        #{countryEn,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null">
+        #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="lon != null">
+        #{lon,jdbcType=VARCHAR},
+      </if>
+      <if test="lat != null">
+        #{lat,jdbcType=VARCHAR},
+      </if>
+      <if test="loginStatus != null">
+        #{loginStatus,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="userGroup != null">
+        #{userGroup,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  
+  <update id="updateDstIpLogin" parameterType="com.sshfortress.common.entity.DstipLogin">
+    update dstip_login
+    <set>
+      <if test="dstIp != null">
+        dst_ip = #{dstIp,jdbcType=VARCHAR},
+      </if>
+      <if test="countryCn != null">
+        country_cn = #{countryCn,jdbcType=VARCHAR},
+      </if>
+      <if test="countryEn != null">
+        country_en = #{countryEn,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null">
+        city = #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="lon != null">
+        lon = #{lon,jdbcType=VARCHAR},
+      </if>
+      <if test="lat != null">
+        lat = #{lat,jdbcType=VARCHAR},
+      </if>
+      <if test="loginStatus != null">
+        login_status = #{loginStatus,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="userGroup != null">
+        user_group = #{userGroup,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where dst_ip = #{dstIp}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.sshfortress.common.entity.DstipLogin">
+    update dstip_login
+    set dst_ip = #{dstIp,jdbcType=VARCHAR},
+      country_cn = #{countryCn,jdbcType=VARCHAR},
+      country_en = #{countryEn,jdbcType=VARCHAR},
+      city = #{city,jdbcType=VARCHAR},
+      lon = #{lon,jdbcType=VARCHAR},
+      lat = #{lat,jdbcType=VARCHAR},
+      login_status = #{loginStatus,jdbcType=INTEGER},
+      user_id = #{userId,jdbcType=VARCHAR},
+      user_group = #{userGroup,jdbcType=BIGINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      remark = #{remark,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.sshfortress.common.entity.DstipLogin">
+    update dstip_login
+    set dst_ip = #{dstIp,jdbcType=VARCHAR},
+      country_cn = #{countryCn,jdbcType=VARCHAR},
+      country_en = #{countryEn,jdbcType=VARCHAR},
+      city = #{city,jdbcType=VARCHAR},
+      lon = #{lon,jdbcType=VARCHAR},
+      lat = #{lat,jdbcType=VARCHAR},
+      login_status = #{loginStatus,jdbcType=INTEGER},
+      user_id = #{userId,jdbcType=VARCHAR},
+      user_group = #{userGroup,jdbcType=BIGINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

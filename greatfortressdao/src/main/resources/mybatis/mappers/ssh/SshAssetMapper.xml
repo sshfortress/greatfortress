@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sshfortress.dao.ssh.mapper.SshAssetMapper">
+  <resultMap id="BaseResultMap" type="com.sshfortress.common.entity.SshAsset">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="ssh_id" jdbcType="VARCHAR" property="sshId" />
+    <result column="asset_id" jdbcType="VARCHAR" property="assetId" />
+    <result column="asset_group" jdbcType="VARCHAR" property="assetGroup" />
+    <result column="asset_dst_id" jdbcType="VARCHAR" property="assetDstId" />
+    <result column="is_enable"  property="isEnable" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, ssh_id, asset_id, asset_group,is_enable
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ssh_asset
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  
+  <select id="isExistSshAssetByEnable" resultType="java.lang.String" parameterType="java.lang.String">
+  	select
+  	GROUP_CONCAT(asset_group)
+  	from
+  	ssh_asset
+  	where
+  	ssh_id=#{sshId}
+  </select>
+  
+  <!-- 是否授权 -->
+  <update id="isEnableBySshIdBatch" parameterType="java.util.Map">
+  	update ssh_asset set is_enable=IF(is_enable=10,20,10) where ssh_id=#{sshId}
+  </update>
+  
+  <!-- 解绑关系 -->
+  <delete id="unbindingSshAsset" parameterType="java.lang.String">
+    delete from ssh_asset
+    where ssh_id = #{sshId}
+  </delete>
+  
+  <!-- 批量增加关系 -->
+  <insert id="bindingSshAssetByBatch" parameterType="com.sshfortress.common.entity.SshAsset">
+    insert into ssh_asset 
+    (ssh_id, asset_id,asset_group,is_enable,asset_dst_id)
+    values 
+    <foreach collection="list" item="item" separator=",">
+    (#{item.sshId}, #{item.assetId}, #{item.assetGroup},#{item.isEnable},#{item.assetDstId})
+    </foreach>
+  </insert>
+  
+  <!-- 绑定SSH用户和资产组的关系 -->
+  <insert id="bindingSshAsset" parameterType="com.sshfortress.common.entity.SshAsset">
+    insert into ssh_asset
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="sshId != null">
+        ssh_id,
+      </if>
+      <if test="assetId != null">
+        asset_id,
+      </if>
+      <if test="assetGroup != null">
+        asset_group,
+      </if>
+      <if test="assetDstId != null">
+        asset_dst_id,
+      </if>
+      <if test="isEnable != null">
+        is_enable,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="sshId != null">
+        #{sshId,jdbcType=VARCHAR},
+      </if>
+      <if test="assetId != null">
+        #{assetId,jdbcType=VARCHAR},
+      </if>
+      <if test="assetGroup != null">
+        #{assetGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="assetDstId != null">
+        #{assetDstId,jdbcType=VARCHAR},
+      </if>
+      <if test="isEnable != null">
+        #{isEnable},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.sshfortress.common.entity.SshAsset">
+    update ssh_asset
+    <set>
+      <if test="sshId != null">
+        ssh_id = #{sshId,jdbcType=VARCHAR},
+      </if>
+      <if test="assetId != null">
+        asset_id = #{assetId,jdbcType=VARCHAR},
+      </if>
+      <if test="assetGroup != null">
+        asset_group = #{assetGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="assetDstId != null">
+        asset_dst_id = #{assetGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="isEnable != null">
+        is_enable = #{isEnable},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.sshfortress.common.entity.SshAsset">
+    update ssh_asset
+    set ssh_id = #{sshId,jdbcType=VARCHAR},
+      asset_id = #{assetId,jdbcType=VARCHAR},
+      asset_group = #{assetGroup,jdbcType=VARCHAR},
+      asset_dst_id = #{assetDstId,jdbcType=VARCHAR},
+      is_enable = #{isEnable}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

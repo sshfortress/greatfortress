@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sshfortress.dao.upload.mapper.TbResourceFileMapper">
+
+  <insert id="insert" parameterType="com.sshfortress.common.entity.TbResourceFile">
+    insert into tb_resource_file (source_url, source_suffix, 
+      source_size, source_old_name, source_name, 
+      source_createtime, source_userid,remark)
+    values (#{sourceUrl,jdbcType=VARCHAR}, #{sourceSuffix,jdbcType=VARCHAR}, 
+      #{sourceSize,jdbcType=DECIMAL}, #{sourceOldName,jdbcType=VARCHAR}, #{sourceName,jdbcType=VARCHAR}, 
+      now(), #{sourceUserid,jdbcType=BIGINT},#{remark})
+  </insert>
+  
+</mapper>

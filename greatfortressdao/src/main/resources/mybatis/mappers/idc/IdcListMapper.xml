@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sshfortress.dao.idc.mapper.IdcListMapper">
+  <resultMap id="BaseResultMap" type="com.sshfortress.common.entity.IdcList">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="idc_name" jdbcType="VARCHAR" property="idcName" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="contact" jdbcType="VARCHAR" property="contact" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="operator" jdbcType="VARCHAR" property="operator" />
+    <result column="inner_net" jdbcType="VARCHAR" property="innerNet" />
+    <result column="extranet" jdbcType="VARCHAR" property="extranet" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
+    <result column="creator" jdbcType="VARCHAR" property="creator" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, idc_name, address, contact, phone, operator, inner_net, extranet, create_time, 
+    update_time, is_delete, creator
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from idc_list
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from idc_list
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.sshfortress.common.entity.IdcList">
+    insert into idc_list (id, idc_name, address, 
+      contact, phone, operator, 
+      inner_net, extranet, create_time, 
+      update_time, is_delete, creator
+      )
+    values (#{id,jdbcType=BIGINT}, #{idcName,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, 
+      #{contact,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{operator,jdbcType=VARCHAR}, 
+      #{innerNet,jdbcType=VARCHAR}, #{extranet,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{isDelete,jdbcType=INTEGER}, #{creator,jdbcType=VARCHAR}
+      )
+  </insert>
+  
+  <!-- 资产组名是否已存在 -->
+  <select id="isExistName" parameterType="java.util.Map" resultType="java.lang.String">
+  	select idc_name from idc_list where is_delete=0 and idc_name=#{idcName}
+  </select>
+  
+  <!-- 机房分页列表 -->
+  <select id="getIdcPageList" parameterType="java.util.Map" resultType="com.sshfortress.common.model.PageListByIdc">
+  	select
+	a.id idcId,
+	a.idc_name idcName,
+	IFNULL(a.contact,'')contact,
+	IFNULL(a.phone,'')phone,
+	IFNULL(a.operator,'')operator,
+	(select COUNT(h.id) from asset_list h where h.idc_id=a.id and h.is_delete=0)assetNumber
+	from 
+	idc_list a
+	where a.is_delete=0
+	<if test=" searchText !=null and searchText !='' ">
+		and INSTR(
+				CONCAT(IFNULL(a.idc_name,''),
+				       IFNULL(a.contact,''),
+				       IFNULL(a.phone,''),
+				       IFNULL(a.operator,''),
+				       (select COUNT(h.id) from asset_list h where h.idc_id=a.id and h.is_delete=0)
+	      			  )
+				,#{searchText})>0
+	</if>
+	order by a.create_time desc,a.id
+  </select>
+  
+  <!-- 详情 -->
+  <select id="getIdcDetail" parameterType="java.util.Map" resultType="com.sshfortress.common.model.DetailByIdc">
+  	select
+  	a.id idcId, 
+  	a.idc_name, 
+  	a.address, 
+  	a.contact, 
+  	a.phone, 
+  	a.operator, 
+  	a.inner_net, 
+  	a.extranet
+  	from 
+  	idc_list a
+  	where 
+  	a.is_delete=0
+  	and a.id=#{idcId}
+  </select>
+  
+  <!-- 增加 -->
+  <insert id="addIdc" parameterType="com.sshfortress.common.entity.IdcList">
+    insert into idc_list
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="idcName != null">
+        idc_name,
+      </if>
+      <if test="address != null">
+        address,
+      </if>
+      <if test="contact != null">
+        contact,
+      </if>
+      <if test="phone != null">
+        phone,
+      </if>
+      <if test="operator != null">
+        operator,
+      </if>
+      <if test="innerNet != null">
+        inner_net,
+      </if>
+      <if test="extranet != null">
+        extranet,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="isDelete != null">
+        is_delete,
+      </if>
+      <if test="creator != null">
+        creator,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="idcName != null">
+        #{idcName,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="contact != null">
+        #{contact,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="operator != null">
+        #{operator,jdbcType=VARCHAR},
+      </if>
+      <if test="innerNet != null">
+        #{innerNet,jdbcType=VARCHAR},
+      </if>
+      <if test="extranet != null">
+        #{extranet,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isDelete != null">
+        #{isDelete,jdbcType=INTEGER},
+      </if>
+      <if test="creator != null">
+        #{creator,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <!-- 更新 -->
+  <update id="updateIdc" parameterType="com.sshfortress.common.entity.IdcList">
+    update idc_list
+    <set>
+      <if test="idcName != null">
+        idc_name = #{idcName,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="contact != null">
+        contact = #{contact,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="operator != null">
+        operator = #{operator,jdbcType=VARCHAR},
+      </if>
+      <if test="innerNet != null">
+        inner_net = #{innerNet,jdbcType=VARCHAR},
+      </if>
+      <if test="extranet != null">
+        extranet = #{extranet,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isDelete != null">
+        is_delete = #{isDelete,jdbcType=INTEGER},
+      </if>
+      <if test="creator != null">
+        creator = #{creator,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.sshfortress.common.entity.IdcList">
+    update idc_list
+    set idc_name = #{idcName,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      contact = #{contact,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      operator = #{operator,jdbcType=VARCHAR},
+      inner_net = #{innerNet,jdbcType=VARCHAR},
+      extranet = #{extranet,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      is_delete = #{isDelete,jdbcType=INTEGER},
+      creator = #{creator,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

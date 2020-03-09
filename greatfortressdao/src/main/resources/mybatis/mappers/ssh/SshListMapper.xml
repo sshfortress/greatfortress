@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sshfortress.dao.ssh.mapper.SshListMapper">
+  <resultMap id="BaseResultMap" type="com.sshfortress.common.entity.SshList">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="creator" jdbcType="VARCHAR" property="creator" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, name, password, remark, is_delete, create_time, update_time, creator
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ssh_list
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from ssh_list
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.sshfortress.common.entity.SshList">
+    insert into ssh_list (id, name, password, 
+      remark, is_delete, create_time, 
+      update_time, creator)
+    values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{isDelete,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{creator,jdbcType=VARCHAR})
+  </insert>
+  
+  <!-- 名称是否存在 -->
+  <select id="isExistNameBySsh" parameterType="java.util.Map" resultType="java.lang.String">
+  	select name from ssh_list where is_delete=0 and name=#{name}
+  </select>
+  
+  <!-- SSH分页列表 -->
+  <select id="getSshPageList" parameterType="java.util.Map" resultType="com.sshfortress.common.model.PageListBySsh">
+  	select
+  	a.id sshId,
+	a.name,
+	IFNULL(
+	(select GROUP_CONCAT(
+			CONCAT(
+				t.group_name,
+				'--',
+				IFNULL((select dst_name from asset_dst where id=h.asset_dst_id),''),
+				'(',
+				IF(h.is_enable=10,'已授权','未授权'),
+				')'
+				)
+			) from ssh_asset h,asset_group t where h.asset_group=t.id and h.ssh_id=a.id)
+	,'') assetGroupName
+	from
+	ssh_list a
+	where
+	a.is_delete=0
+	<if test=" searchText !=null and searchText !='' ">
+		and INSTR(CONCAT(
+						IFNULL(a.name,''),
+						IFNULL((select t.group_name from ssh_asset h,asset_group t where h.asset_group=t.id and h.ssh_id=a.id),'')
+						)
+			,#{searchText})>0
+	</if>
+	order by a.create_time desc,a.id
+  </select>
+  
+  <!-- 详情 -->
+  <select id="getDetailBySsh" parameterType="java.util.Map" resultType="com.sshfortress.common.model.DetailBySsh">
+  	select
+	a.name,
+	IFNULL(a.remark,'') remark,
+	IFNULL((select GROUP_CONCAT(h.asset_group) from ssh_asset h where h.ssh_id=a.id),'') assetGroupId,
+	IFNULL((select GROUP_CONCAT(k.group_name) from ssh_asset h,asset_group k where h.ssh_id=a.id and h.asset_group=k.id),'') assetGroupName,
+	IFNULL((select GROUP_CONCAT(h.asset_id) from ssh_asset h where h.ssh_id=a.id),'')assetId,
+	IFNULL((select GROUP_CONCAT(k.host_name) from ssh_asset h,asset_list k where h.ssh_id=a.id and h.asset_id=k.id),'') assetName,
+	IFNULL((select GROUP_CONCAT(h.asset_dst_id) from ssh_asset h where h.ssh_id=a.id),'') dstId,
+	IFNULL((select GROUP_CONCAT(k.dst_name) from ssh_asset h,asset_dst k where h.ssh_id=a.id and h.asset_dst_id=k.id),'') dstName,
+	IFNULL((select GROUP_CONCAT(h.is_enable) from ssh_asset h where h.ssh_id=a.id),'')isEnable
+	from
+	ssh_list a
+	where
+	a.is_delete=0
+	and a.id=#{sshId}
+  </select>
+  
+  <!-- 增加 -->
+  <insert id="addSSH" parameterType="com.sshfortress.common.entity.SshList"
+  	useGeneratedKeys="true" keyProperty="id">
+    insert into ssh_list
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="password != null">
+        password,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="isDelete != null">
+        is_delete,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="creator != null">
+        creator,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+      AES_ENCRYPT(#{password},fun_getDictName('AESPrivateKey',10)),
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="isDelete != null">
+        #{isDelete,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creator != null">
+        #{creator,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <!-- 更新 -->
+  <update id="updateSSH" parameterType="com.sshfortress.common.entity.SshList">
+    update ssh_list
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        password=AES_ENCRYPT(#{password},fun_getDictName('AESPrivateKey',10)),
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="isDelete != null">
+        is_delete = #{isDelete,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creator != null">
+        creator = #{creator,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.sshfortress.common.entity.SshList">
+    update ssh_list
+    set name = #{name,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      is_delete = #{isDelete,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      creator = #{creator,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

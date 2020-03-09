@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sshfortress.dao.commands.mapper.CommandsMapper">
+  
+  <!-- 命令分页列表 -->
+  <select id="getCommandsPageList" parameterType="java.util.Map" resultType="com.sshfortress.common.model.PageListByCommands">
+  	select
+  	IFNULL(a.cmd,'')cmd,
+  	IFNULL(a.user_name,'')userName,
+  	DATE_FORMAT(a.at,'%Y-%m-%d %T') createTime
+  	from
+  	commands a
+  	where
+  	1=1
+  	<if test="searchText !='' and searchText !=null">
+  		and INSTR(
+  				CONCAT(
+  					IFNULL(a.cmd,''),
+  					IFNULL(a.user_name,'')
+  				),
+  				#{searchText}
+  		)>0
+  	</if>
+  	<if test="minTime !=null and minTime !=''">
+  		<![CDATA[
+  		and DATE_FORMAT(a.at,'%Y-%m-%d %T')>=#{minTime}
+  		]]>
+  	</if>
+  	<if test="maxTime !=null and maxTime !=''">
+  		<![CDATA[
+  		and DATE_FORMAT(a.at,'%Y-%m-%d %T')<=#{maxTime}
+  		]]>
+  	</if>
+  	
+  	order by a.at desc,a.id
+  </select>
+  
+</mapper>

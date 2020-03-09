@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sshfortress.dao.system.mapper.SysAreaMapper" >
+  <resultMap id="BaseResultMap" type="com.sshfortress.common.beans.SysArea" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="aname" property="aname" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="first_spell" property="firstSpell" jdbcType="VARCHAR" />
+    <result column="full_spell" property="fullSpell" jdbcType="VARCHAR" />
+    <result column="per_spell" property="perSpell" jdbcType="VARCHAR" />
+    <result column="aflag" property="aflag" jdbcType="VARCHAR" />
+    <result column="nlevel" property="nlevel" jdbcType="INTEGER" />
+    <result column="left_id" property="leftId" jdbcType="BIGINT" />
+    <result column="right_id" property="rightId" jdbcType="BIGINT" />
+  </resultMap>
+  
+   <resultMap id="AreaTreeResultMap" type="com.sshfortress.common.beans.SysArea" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="aname" property="aname" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="nlevel" property="nlevel" jdbcType="INTEGER" />
+    <result column="left_id" property="leftId" jdbcType="BIGINT" />
+    <result column="right_id" property="rightId" jdbcType="BIGINT" />
+    <result column="first_spell" property="firstSpell" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  
+  <sql id="Base_Column_List" >
+    id, aname, code, first_spell, full_spell, per_spell, aflag, nlevel, left_id, right_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_area
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from sys_area
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.sshfortress.common.beans.SysArea" >
+    insert into sys_area (id, aname, code, 
+      first_spell, full_spell, per_spell, 
+      aflag, nlevel, left_id, 
+      right_id)
+    values (#{id,jdbcType=BIGINT}, #{aname,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, 
+      #{firstSpell,jdbcType=VARCHAR}, #{fullSpell,jdbcType=VARCHAR}, #{perSpell,jdbcType=VARCHAR}, 
+      #{aflag,jdbcType=VARCHAR}, #{nlevel,jdbcType=INTEGER}, #{leftId,jdbcType=BIGINT}, 
+      #{rightId,jdbcType=BIGINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.sshfortress.common.beans.SysArea" >
+    insert into sys_area
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="aname != null" >
+        aname,
+      </if>
+      <if test="code != null" >
+        code,
+      </if>
+      <if test="firstSpell != null" >
+        first_spell,
+      </if>
+      <if test="fullSpell != null" >
+        full_spell,
+      </if>
+      <if test="perSpell != null" >
+        per_spell,
+      </if>
+      <if test="aflag != null" >
+        aflag,
+      </if>
+      <if test="nlevel != null" >
+        nlevel,
+      </if>
+      <if test="leftId != null" >
+        left_id,
+      </if>
+      <if test="rightId != null" >
+        right_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="aname != null" >
+        #{aname,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="firstSpell != null" >
+        #{firstSpell,jdbcType=VARCHAR},
+      </if>
+      <if test="fullSpell != null" >
+        #{fullSpell,jdbcType=VARCHAR},
+      </if>
+      <if test="perSpell != null" >
+        #{perSpell,jdbcType=VARCHAR},
+      </if>
+      <if test="aflag != null" >
+        #{aflag,jdbcType=VARCHAR},
+      </if>
+      <if test="nlevel != null" >
+        #{nlevel,jdbcType=INTEGER},
+      </if>
+      <if test="leftId != null" >
+        #{leftId,jdbcType=BIGINT},
+      </if>
+      <if test="rightId != null" >
+        #{rightId,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.sshfortress.common.beans.SysArea" >
+    update sys_area
+    <set >
+      <if test="aname != null" >
+        aname = #{aname,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="firstSpell != null" >
+        first_spell = #{firstSpell,jdbcType=VARCHAR},
+      </if>
+      <if test="fullSpell != null" >
+        full_spell = #{fullSpell,jdbcType=VARCHAR},
+      </if>
+      <if test="perSpell != null" >
+        per_spell = #{perSpell,jdbcType=VARCHAR},
+      </if>
+      <if test="aflag != null" >
+        aflag = #{aflag,jdbcType=VARCHAR},
+      </if>
+      <if test="nlevel != null" >
+        nlevel = #{nlevel,jdbcType=INTEGER},
+      </if>
+      <if test="leftId != null" >
+        left_id = #{leftId,jdbcType=BIGINT},
+      </if>
+      <if test="rightId != null" >
+        right_id = #{rightId,jdbcType=BIGINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.sshfortress.common.beans.SysArea" >
+    update sys_area
+    set aname = #{aname,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      first_spell = #{firstSpell,jdbcType=VARCHAR},
+      full_spell = #{fullSpell,jdbcType=VARCHAR},
+      per_spell = #{perSpell,jdbcType=VARCHAR},
+      aflag = #{aflag,jdbcType=VARCHAR},
+      nlevel = #{nlevel,jdbcType=INTEGER},
+      left_id = #{leftId,jdbcType=BIGINT},
+      right_id = #{rightId,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  
+   <select id="selectSimplAreaByPrimaryKey" resultType="com.sshfortress.common.beans.SimpleAreaDo" parameterType="java.lang.Long" >
+    select  id, aname, nlevel,left_id as leftId, right_id as rightId from sys_area
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  
+   <select id="selectParantSimpleArea" resultType="com.sshfortress.common.beans.SimpleAreaDo" parameterType="java.util.Map" >
+    <![CDATA[
+     select id, aname, nlevel,left_id as leftId, right_id as rightId from sys_area
+     where left_id <= #{leftId} and right_id  >= #{rightId} and nlevel  = (#{nlevel}-1)
+    ]]>
+  </select>
+  
+   <select id="selectChildren" resultType="com.sshfortress.common.beans.SimpleAreaDo" parameterType="java.util.Map" >
+    select id, aname, nlevel,left_id as leftId, right_id as rightId from sys_area 
+    where  nlevel = #{nlevel}
+     <if test="null != leftId and leftId != '' and null != rightId and rightId != ''">
+        <![CDATA[
+        and left_id > #{leftId} and right_id  < #{rightId}
+    	]]>
+    </if>
+  </select>
+  
+  <select id="selectListByParantId" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_area
+    where left_id >= (select left_id from sys_area where id=#{id}) 
+    and (select right_id from sys_area where id=#{id}) >= right_id 
+    <if test = "null != nlevel">
+    	and nlevel = #{nlevel}
+    </if>
+    order by left_id 
+  </select>
+  
+  
+  <select id="selectAllArea" resultMap="AreaTreeResultMap">
+  	select id, aname, code, nlevel, left_id, right_id,first_spell
+    from sys_area where nlevel >= 1
+  </select>
+  
+  <!-- 获取全国的市地区列表 -->
+  <select id="selectAreaByCity" resultType="java.util.Map">
+  	select id, aname
+    from sys_area where nlevel=3
+    
+    <if test="searchText!=null and searchText!=''">
+     and (instr(aname,#{searchText})>0
+         or 
+         instr(per_spell,#{searchText})>0
+         )
+    </if> 
+  </select>
+  
+</mapper>
