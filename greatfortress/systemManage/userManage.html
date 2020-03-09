@@ -1,0 +1,888 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>SSH用户</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link rel="stylesheet" href="../common/layui/css/layui.css" />
+		<link rel="stylesheet" href="../common/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="../common/css/bootstrap-select.css">
+		<link rel="stylesheet" type="text/css" href="../common/css/bootstrap-select.min.css">
+		<style>
+			*{ margin:0; padding:0; list-style:none;}
+			a{ text-decoration:none;}
+			a:hover{ text-decoration:none;}
+			.tcdPageCode{padding: 15px 20px;text-align: left;color: #ccc;text-align:center;}
+			.tcdPageCode a{display: inline-block;color: #428bca;display: inline-block;height: 25px;	line-height: 25px;	padding: 0 10px;border: 1px solid #ddd;	margin: 0 2px;border-radius: 4px;vertical-align: middle;}
+			.tcdPageCode a:hover{text-decoration: none;border: 1px solid #428bca;}
+			.tcdPageCode span.current{display: inline-block;height: 25px;line-height: 25px;padding: 0 10px;margin: 0 2px;color: #fff;background-color: #428bca;	border: 1px solid #428bca;border-radius: 4px;vertical-align: middle;}
+			.tcdPageCode span.disabled{	display: inline-block;height: 25px;line-height: 25px;padding: 0 10px;margin: 0 2px;	color: #bfbfbf;background: #f2f2f2;border: 1px solid #bfbfbf;border-radius: 4px;vertical-align: middle;}
+		    .modal-content{
+		    	width:700px
+		    }
+		</style>
+	</head>
+	<body style="padding:20px;" id="translation">
+		<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;border: none;border-bottom: 1px solid #666;">
+			<legend style="border:none">SSH用户
+			<div class="form-group" style="float:right;margin-right:30px;">
+					<img src="../common/image/shuaxin.jpg" alt="" class="shua" />
+				</div>
+				<br />
+			</legend>
+		</fieldset>
+		<form id="search" class="form-inline clearfix">
+			<div class="searchItems">
+				<div class="form-group">
+					<input type="text" value="" class="form-control checkLogs" id="orderNum" placeholder="用户名称" autocomplete="off">
+					<ul class="dropdown-menu">
+					</ul>
+				</div>
+				<div class="form-group">
+					显示
+					<select class="form-control" id="m-fen">
+                           <option data-type="10">10</option> 
+                           <option data-type="15">15</option> 
+                           <option data-type="25">25</option> 
+                           <option data-type="50">50</option> 
+                           <option data-type="">ALL</option> 
+                    </select>
+                                        项结果
+				</div>
+				<button class="layui-btn layui-btn-normal header-dropdown-menu" id="j-search" >&nbsp;&nbsp;&nbsp;&nbsp;搜索&nbsp;&nbsp;&nbsp;&nbsp;</button>
+				<!--<div class="form-group">
+					<button class="layui-btn layui-btn-normal header-dropdown-menu addjiao" style="background: #997cd7;">角色管理</button>
+				</div>-->
+				<div class="form-group">
+					<button class="layui-btn layui-btn-normal header-dropdown-menu addPeople" style="background: #3dae4c;">添加用户</button>
+				</div>
+				
+			</div>
+		</form>
+		<table id="biuuu_city_list" class="layui-table">
+			<thead>
+				<tr>
+					<th style="text-align: center;"><label><input id="allCkeck" type="checkbox"/></label></th>
+					<th style="text-align: center;">用户ID</th>
+					<th style="text-align: center;">SSH登录名称</th>
+					<th style="text-align: center;">资产组名称</th>
+					<th style="text-align: center;">操作</th>
+				</tr>
+			</thead>
+			<tbody style="text-align: center;">
+              
+			</tbody>
+		</table>
+		<div class="form-group form-inline clearfix" style="width:300px">
+			<select class="form-control" id="m-fen1">
+                 <option data-type="1">批量删除</option>   
+            </select>
+             <button class="layui-btn layui-btn-xs pi">提交</button>
+		</div>	
+		
+		<div class="tcdPageCode"></div>
+		<div id="demo8" style="text-align: center;"></div>
+		<!--<div class="hide">
+			<div id="x-address">
+				<div class="form-group form-inline clearfix">
+					用户名称
+					<input type="text" value="" class="form-control checkLogs" id="yy" placeholder="" autocomplete="off">
+				</div>
+				<div class="form-group form-inline clearfix">
+					标识&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<input type="text" value="" class="form-control checkLogs" id="bs" placeholder="" autocomplete="off">
+				</div>
+				<div class="form-group form-inline clearfix">
+					备注&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<textarea class="form-control" rows="3" cols="60" id="bz" placeholder="请填写备注(必填)"></textarea>
+				</div>
+			</div>
+		</div>-->
+		<div class="hide">
+			<div id="x-address">
+				<div class="form-group form-inline clearfix">
+					SSH登录名称：
+					<input type="text" value="" class="form-control checkLogs" id="yx" placeholder=""   autocomplete="off">
+				</div>
+				<div class="form-group form-inline clearfix">
+					SSH登录密码：
+					<input type="password" value="" class="form-control checkLogs" id="ymi" placeholder=""   autocomplete="off">
+				</div>
+				<!--<div class="form-group form-inline clearfix" style="width:100%">
+					<sapn class="tit">选择资产组：</span>
+				</div>	-->
+				<div class="form-group form-inline clearfix">
+					<sapn class="tit">选择资产组：</sapn>
+					<select class="form-control" id="m-fen11">
+                         
+                    </select>
+                   <!-- <sapn class="tit">选择资产：</sapn>-->
+					<!--<select class="form-control" id="m-fen2">
+                           
+                    </select>-->
+                   <!-- <sapn class="tit">选择目标用户：</sapn>-->
+					<select class="form-control" id="m-fen3">
+                         
+                    </select>
+                    <sapn class="tit">是否授权：</sapn>
+					<select class="form-control" id="m-fen4">
+                         <option data-type="20">否</option>  
+                         <option data-type="10">是</option>  
+                    </select>
+                    <button class="layui-btn layui-btn-normal header-dropdown-menu" id="tjia" >&nbsp;&nbsp;&nbsp;&nbsp;添加&nbsp;&nbsp;&nbsp;&nbsp;</button>
+				</div>
+				<div class="selectWrap1" style="max-height:300px;overflow: scroll;">
+		                <table class="table table-bordered table-hover xTable">
+		                    <thead>
+		                    <tr>
+		                        <th style="text-align: center;">资产组名称</th>
+		                        <th style="text-align: center;">目标用户</th>
+		                        <th style="text-align: center;">是否授权</th>
+		                        <th style="text-align: center;">操作</th>
+		                    </tr>
+		                    </thead>
+		                    <tbody>
+		                  
+		                    </tbody>
+		                </table>
+		            </div>
+		            <br /><br />
+				<div class="form-group form-inline clearfix">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;备注：
+					<textarea class="form-control" rows="3" cols="60" id="bz" placeholder="请填写备注"></textarea>
+				</div>
+			</div>
+		</div>
+		<div class="hide">
+			<div id="removePeople">
+				确定删除？
+			</div>
+		</div>
+		<div class="hide">
+			<div id="qshou">
+				确定授权？
+			</div>
+		</div>
+		<div class="hide">
+			<div id="xshou">
+				取消授权？
+			</div>
+		</div>
+		<div class="hide">
+			<div id="quan">
+				<ul id="q-lie" class="list-group" style="height:300px;overflow: scroll;">
+
+				</ul>
+			</div>
+		</div>
+		<script src="../common/js/jquery-1.12.3.min.js"></script>
+		<script type="text/javascript" src="../common/layui/layui.js"></script>
+		<script src="../common/layui/lay/modules/laydate.js"></script>
+		<script src='../common/layui/lay/modules/laypage.js'></script>
+		<script src="../common/js/bootstrap.min.js"></script>
+		<script src="../common/js/jquery.bootstrap.min.js"></script>
+		<script src="../common/js/search-logs.js"></script>
+		<script src="../common/js/jquery.page.js"></script>
+		<script src="../common/js/md5.js"></script>
+		<script>
+		var newCookie=sessionStorage.ticket;
+		var userId=sessionStorage.roleId;
+		(function ($) {
+		            $.getUrlParam = function (name) {
+		                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+		                var r = window.location.search.substr(1).match(reg);
+		                if (r != null) return unescape(r[2]); return null;
+		            }
+		        })(jQuery);
+		        var xx = $.getUrlParam('x');
+		         var y = $.getUrlParam('y');
+		        var name=decodeURI($.getUrlParam('name'));
+		        var pSize=decodeURI($.getUrlParam('pSize'));
+		       // var flag=decodeURI($.getUrlParam('flag'));
+		         if(xx==null){
+		        	xx=1;
+		        }else{
+		        	xx=$.getUrlParam('x');
+		        };
+		        if(name=="null"){
+		        	name=""
+		        };
+		        if(pSize=="null"){
+		        	pSize=10;
+		        }
+		        if(y==null){
+		        	 var list={
+			        	currentPage:xx,
+						pageSize:pSize,
+						ticket:newCookie
+			           };
+		        }else{
+		        	 var list={
+		        	 	searchText:name,
+		        	 	currentPage:xx,
+		        	 	pageSize:pSize,
+						ticket:newCookie
+		             }
+		        }
+		       $("#orderNum").val(name);
+		       //$("#companyName").val(flag);
+		       $("#m-fen option[data-type='"+pSize +"']").prop("selected", true);
+      	      //获取角色列表
+			    $.ajax({
+				type: "post",
+				url: href+"ssh/getSshPageList.web",
+				data:list,
+				success: function(data) {
+					var length = data.data.pager.totalPage;
+					xx= data.data.pager.currentPage;
+					var d = data.data.dataList;
+					var str = '';
+					if(d.length){
+				    for(var i=0;i<d.length;i++) {
+				    if(d[i].isEnable==10){
+				    str += '<tr><td class="xz" data-id='+d[i].sshId+'><input data-id='+d[i].sshId+' class="zx" type="checkbox"></td><td>' + d[i].sshId + '</td><td>' + d[i].name + '</td><td>' + d[i].assetGroupName + '</td><td><img src="../common/image/shanchu.png" data-id="'+d[i].sshId+'" class="remove" style="cursor: pointer;" alt="" /><img data-id="'+d[i].sshId+'"  class="xiu" src="../common/image/bianji.png" alt="" style="margin-left:30px;cursor: pointer;"/></td></tr>';	
+				    }else{
+				    str += '<tr><td class="xz" data-id='+d[i].sshId+'><input data-id='+d[i].sshId+' class="zx" type="checkbox"></td><td>' + d[i].sshId + '</td><td>' + d[i].name + '</td><td>' + d[i].assetGroupName + '</td><td><img src="../common/image/shanchu.png" data-id="'+d[i].sshId+'" class="remove" style="cursor: pointer;" alt="" /><img data-id="'+d[i].sshId+'"   class="xiu" src="../common/image/bianji.png" alt="" style="margin-left:30px;cursor: pointer;"/></td></tr>';	
+				    }
+					};		
+					}else{
+						str='<tr><td colspan="5">无数据</td></tr>';
+					}
+					
+					$("#biuuu_city_list tbody").html(str);
+					 $(".tcdPageCode").createPage({
+				        pageCount:length,
+				        current:xx,
+				        backFn:function(p){
+				        	if(y==null){
+				        	var b=$('#m-fen option:selected').data('type');	
+				        	 window.location.href="userManage.html?x="+p+"&pSize="+encodeURI(encodeURI(b));	
+				        	}else{
+				        		var a=$("#orderNum").val(),b=$('#m-fen option:selected').data('type');
+				                window.location.href="userManage.html?x="+p+"&name="+encodeURI(encodeURI(a))+"&pSize="+encodeURI(encodeURI(b))+"&y="+1;
+				        	}
+				          
+				           
+				        }
+					 });
+					 //去重
+					 for(var i=0;i<$(".tcdPageCode a").length-1;i++){
+					 	if($(".tcdPageCode a").eq(i).text()==$(".tcdPageCode a").eq(i+1).text()){
+					 		$(".tcdPageCode a").eq(i).remove()
+					 	}
+					 }
+				},
+				error: function() {
+					alert()
+				}
+			});
+			//刷新页面
+				$(".shua").on('click',function(event){
+					event.preventDefault();
+					window.location.href="userManage.html"
+				});
+				//用户角色
+				function jiao(x,y){
+					$.ajax({
+						type:"post",
+						url:href+"common/assetGroupList.do",
+						data:{
+							ticket:newCookie
+						},
+						dataType:"json",
+						success:function(data){
+							if(data.status==1){
+							  var d=data.data;
+							  var otr="";
+							     if(d.length){
+								 for(var i=0;i<d.length;i++){
+									otr += '<tr style="text-align:center"><td>'+(i+1)+'</td><td><input data-id="'+d[i].groupId+'" type="checkbox" name="xuan" class="xuan"></td><td>'+d[i].groupName+'</td><td><input data-id="'+d[i].groupId+'" type="checkbox" name="xuan2" class="xuan2"></td></tr>'
+										};
+										$(".xTable tbody").html(otr);
+									}else{
+										$(".xTable tbody").html('<tr style="text-align: center;"><td colspan="4">无数据</td></tr>');
+									};
+									if(x.length){
+										for(var i=0;i<x.length;i++){
+											for(var j=0;j<$(".xuan").length;j++){
+												if(x[i]==$(".xuan").eq(j).attr("data-id")){
+													$(".xuan").eq(j).prop("checked",true)
+												}
+											}
+										}
+									};
+									if(y.length){
+										for(var i=0;i<y.length;i++){
+											for(var j=0;j<$(".xuan2").length;j++){
+												if(x[i]==$(".xuan2").eq(j).attr("data-id")){
+													$(".xuan2").eq(j).prop("checked",true)
+												}
+											}
+										}
+									}
+								 }else{
+								     alert(data.showMessage);
+									 return;
+								 }
+						}
+					});
+				}
+			//删除
+			$(document).delegate('.remove', 'click', function(event) {
+				event.preventDefault();
+					var manId = $(this).attr("data-id");
+					$('#removePeople').dialog({
+						title: '删除',
+						onClose: function() {
+							$(this).dialog('close');
+						},
+						buttons: [{
+							text: '取消',
+							'click': function() {
+								$(this).dialog('close');
+							}
+						}, {
+							text: '确定',
+							'class': 'btn-primary',
+							'click': function() {
+								$.ajax({
+									type: "post",
+									url: href+"ssh/del.web",
+									data: {
+										sshId: manId,
+										ticket:newCookie
+									},
+									dataType:"json",
+									success: function(data) {
+										if(data.status==1){
+											window.location.reload()
+										}else{
+											alert(data.showMessage);
+											return;
+										}
+										
+										
+									}
+
+								});
+							}
+						}]
+					})
+
+				});
+				//授权
+			$(document).delegate('.wshou', 'click', function(event) {
+				event.preventDefault();
+					var manId = $(this).attr("data-id");
+					$('#qshou').dialog({
+						title: '授权',
+						onClose: function() {
+							$(this).dialog('close');
+						},
+						buttons: [{
+							text: '取消',
+							'click': function() {
+								$(this).dialog('close');
+							}
+						}, {
+							text: '确定',
+							'class': 'btn-primary',
+							'click': function() {
+								$.ajax({
+									type: "post",
+									url: href+"ssh/isEnableBySsh.web",
+									data: {
+										sshId:manId,
+										ticket:newCookie
+									},
+									dataType:"json",
+									success: function(data) {
+										if(data.status==1){
+											window.location.reload()
+										}else{
+											alert(data.showMessage);
+											return;
+										}
+										
+										
+									}
+
+								});
+							}
+						}]
+					})
+
+				});
+				//取消授权
+			$(document).delegate('.qshou', 'click', function(event) {
+				event.preventDefault();
+					var manId = $(this).attr("data-id");
+					$('#wshou').dialog({
+						title: '取消授权',
+						onClose: function() {
+							$(this).dialog('close');
+						},
+						buttons: [{
+							text: '取消',
+							'click': function() {
+								$(this).dialog('close');
+							}
+						}, {
+							text: '确定',
+							'class': 'btn-primary',
+							'click': function() {
+								$.ajax({
+									type: "post",
+									url: href+"ssh/isEnableBySsh.web",
+									data: {
+										sshId:manId,
+										ticket:newCookie
+									},
+									dataType:"json",
+									success: function(data) {
+										if(data.status==1){
+											window.location.reload()
+										}else{
+											alert(data.showMessage);
+											return;
+										}
+										
+										
+									}
+
+								});
+							}
+						}]
+					})
+
+				})
+			//批量删除
+			$(".pi").on("click",function(event){
+				var arr=[];
+			      	 for(var i=0;i<$(".zx").length;i++){
+				     			if($(".zx").eq(i).prop("checked")){
+				     				arr.push($(".zx").eq(i).attr("data-id"));
+				     			}
+				     };
+				     if(arr.length==0){
+				     	alert("请至少选择一项删除");
+				     	return;
+				     };
+				     var s=arr.join();
+				     $.ajax({
+						type: "post",
+						url: href+"ssh/del.web",
+						data: {
+							sshId:s,
+							ticket:newCookie
+						},
+						dataType:"json",
+						success: function(data) {
+							if(data.status==1){
+								window.location.reload()
+							}else{
+								alert(data.showMessage);
+								return;
+							}
+						}
+
+					});
+				
+			})
+				//添加用户
+			$(document).delegate('.addPeople', 'click', function(event) {
+				event.preventDefault();
+				$("#yx").val("");
+				$("#bz").val("");
+				$("#ymi").val("");
+				///jiao("","");
+				moneygroup("");
+				$(".xTable tbody").html("");
+				$('#x-address').dialog({
+					title: '添加用户',
+					onClose: function() {
+						$(this).dialog('close');
+					},
+					buttons: [{
+						text: '取消',
+						'click': function() {
+							$(this).dialog('close');
+						}
+					}, {
+						text: '确定',
+						'class': 'btn-primary',
+						'click': function() {
+							if($("#yx").val() == "") {
+								alert("请填SSH登录名称");
+								return;
+							};
+							if($("#ymi").val() == "") {
+								alert("请填SSH登录密码");
+								return;
+							};
+							var arr=[],crr=[],drr=[],hrr=[];
+							 if($(".zuid").length){
+                              	for(var i=0;i<$(".zuid").length;i++){
+                              		arr.push($(".zuid").eq(i).attr("data-id"));
+                              		//brr.push($(".mid").eq(i).attr("data-id"));
+                              		crr.push($(".yid").eq(i).attr("data-id"));
+                              		drr.push($(".sid").eq(i).attr("data-id"));
+									hrr.push($(".yid").eq(i).attr("data-type"));
+                              	}
+                              };
+                              if(arr.join()==""){
+                              	alert("请添加目标用户");
+                              	return;
+                              }
+							$.ajax({
+								type: "post",
+								url: href+"ssh/addSsh.web",
+								data: {
+									name:$("#yx").val(),
+									password:$("#ymi").val(),
+									assetGroupId:arr.join(),
+									assetDstId:crr.join(),
+									isEnable:drr.join(),
+									remark:$("#bz").val(),
+									assetId:hrr.join(),
+									ticket:newCookie
+								},
+								dataType:"json",
+								success: function(data) {
+									if(data.status==1){
+									   window.location.reload()
+									 }else{
+									     alert(data.showMessage);
+										 return;
+									 }
+								}
+							});
+						}
+					}]
+				});
+			});
+			//搜索
+			$("#j-search").on("click", function(event) {
+				event.preventDefault();
+				var a=$("#orderNum").val(),b=$('#m-fen option:selected').data('type');
+				window.location.href="userManage.html?x="+1+"&name="+encodeURI(encodeURI(a))+"&pSize="+encodeURI(encodeURI(b))+"&y="+1;
+			});
+			//判断是否授权
+			function shou(x){
+				if(x==10){
+					x="是"
+				}else{
+					x="否"
+				};
+				return x;
+			}
+			//编辑
+			$(document).delegate('.xiu', 'click', function(event) {
+				event.preventDefault();
+				var orderId = $(this).attr("data-id");
+				//获取详情
+				$.ajax({
+					type:"post",
+					url:href+"ssh/getDetail.web",
+					data:{
+						sshId:orderId,
+						ticket:newCookie
+					},
+					dataType:"json",
+					success:function(data){
+						var d=data.data;
+						$("#yx").val(d.name);
+						$("#bz").val(d.remark);
+						$("#ymi").val("******");
+						moneygroup("");
+						var zuname=d.assetGroupName;
+				     	var zuid=d.assetGroupId;
+//				     	var mname=d.assetName;
+//				     	var mid=d.assetId;
+				     	var yhu=d.dstName;
+				     	var yid=d.dstId;
+						var zcid=d.assetId;
+				     	var squan=d.isEnable;
+				     	var arr=[],brr=[],err=[],frr=[],grr=[],hrr=[];
+						if(zuname!=""){
+							var arr=zuname.split(",");
+							var brr=zuid.split(",");
+//							var crr=mname.split(",");
+//							var drr=mid.split(",");
+							var err=yhu.split(",");
+							var frr=yid.split(",");
+							var grr=squan.split(",");
+							var hrr=zcid.split(",");
+						}else{
+							
+						}
+						var otr="";
+						if(arr.length){
+							for(var i=0;i<arr.length;i++){
+					           otr += '<tr style="text-align:center"><td class="zuid" data-id="'+brr[i]+'">'+arr[i]+'</td><td data-id="'+frr[i]+'" class="yid" data-type="'+hrr[i]+'">'+err[i]+'</td><td data-id="'+grr[i]+'" class="sid">'+shou(grr[i])+'</td><td><img src="../common/image/shanchu.png"  class="srov" style="cursor: pointer;" alt="" /></td></tr>'
+							}
+						};
+						$(".xTable tbody").html(otr);	
+						
+						
+					}
+				});
+				var newMi=""
+				$('#ymi').bind('input propertychange', function () {
+                   newMi=$("#ymi").val();
+                 });
+				$('#x-address').dialog({
+					title: '编辑',
+					onClose: function() {
+						$(this).dialog('close');
+					},
+					buttons: [{
+						text: '取消',
+						'click': function() {
+							$(this).dialog('close');
+						}
+					}, {
+						text: '确定',
+						'class': 'btn-primary',
+						'click': function() {
+							if($("#yx").val() == "") {
+								alert("请填SSH登录名称");
+								return;
+							};
+							if($("#ymi").val() == "") {
+								alert("请填SSH登录密码");
+								return;
+							};
+							var arr=[],brr=[],crr=[],drr=[],hrr=[];
+							 if($(".zuid").length){
+                              	for(var i=0;i<$(".zuid").length;i++){
+                              		arr.push($(".zuid").eq(i).attr("data-id"));
+                              		//brr.push($(".mid").eq(i).attr("data-id"));
+                              		crr.push($(".yid").eq(i).attr("data-id"));
+                              		drr.push($(".sid").eq(i).attr("data-id"));
+									hrr.push($(".yid").eq(i).attr("data-type"));
+                              	}
+                              };
+                              if(arr.join()==""){
+                              	alert("请添加目标用户");
+                              	return;
+                              }
+							$.ajax({
+								type: "post",
+								url: href+"ssh/updateSsh.web",
+								data: {
+									sshId:orderId,
+									name:$("#yx").val(),
+									password:newMi,
+									assetGroupId:arr.join(),
+									assetDstId:crr.join(),
+									isEnable:drr.join(),
+									assetId:hrr.join(),
+									remark:$("#bz").val(),
+									ticket:newCookie
+								},
+								dataType:"json",
+								success: function(data) {
+									if(data.status==1){
+									   window.location.reload()
+									 }else{
+									     alert(data.showMessage);
+										 return;
+									 }
+								}
+							});
+						}
+					}]
+				});
+			});
+			//监听分页效果
+			$('#m-fen').on('change',function (event) {
+		     	event.preventDefault();
+		     	var a=$("#orderNum").val(),b=$('#m-fen option:selected').data('type');
+				window.location.href="userManage.html?x="+1+"&name="+encodeURI(encodeURI(a))+"&pSize="+encodeURI(encodeURI(b))+"&y="+1;
+		     });
+            //监听全选按钮
+			 $('#allCkeck').on('change',function (event) {
+		     	event.preventDefault();
+		     	if($('#allCkeck').prop("checked")){
+		     		for(var i=0;i<$(".xz").length;i++){
+		     			$(".xz").eq(i).find('input').prop("checked",true)
+		     		}
+		     	}else{
+		     		for(var i=0;i<$(".xz").length;i++){
+		     			$(".xz").eq(i).find('input').prop("checked",false);
+		     		}
+		     	}
+		     });
+		     //监听不是全选的事件
+		      $('#biuuu_city_list tbody').on('change',".zx",function (event) {
+		      	event.preventDefault();
+			      	var arr=[];
+			      	 for(var i=0;i<$(".zx").length;i++){
+				     			if($(".zx").eq(i).prop("checked")){
+				     				arr.push(i);
+				     			}else{
+				     				
+				     			}
+				     		};
+				    if(arr.length==$(".zx").length){
+				    	$('#allCkeck').prop("checked",true);
+				    }else{
+				    	$('#allCkeck').prop("checked",false);
+				    }
+				     		
+		      });
+		      //监听授权选择
+		      $('.xTable').on('change',".xuan2",function (event) {
+		     	event.preventDefault();
+		     	if($(this).prop("checked")){
+		     			$(this).parent().parent().find('.xuan').prop("checked",true)
+		     	}
+		     });
+		     $('.xTable').on('change',".xuan",function (event) {
+		     	event.preventDefault();
+		     	if($(this).prop("checked")){
+		     			
+		     	}else{
+		     		$(this).parent().parent().find('.xuan2').prop("checked",false)
+		     	}
+		     });
+		     //获取资产组
+			    function moneygroup(x){
+						$.ajax({
+							type:"post",
+							url:href+"ssh/assetGroupList.web",
+							data:{
+								ticket:newCookie
+							},
+							dataType:"json",
+							success:function(data){
+								  var d=data.data;
+								  var otr="";
+								  if(d.length){
+								  	for(var i=0;i<d.length;i++){
+								  		otr += '<option data-type="'+d[i].assetGroupId+'">'+d[i].assetGroupName+'</option>';
+								  	};
+								  	$("#m-fen11").html('<option data-type="">请选择资产组</option>'+otr);
+								  	$("#m-fen11 option[data-type='"+ x +"']").prop("selected", true);
+								  	//$("#m-fen2").html('<option data-type="">请选择资产</option>');
+								  	$("#m-fen3").html('<option data-type="">请选择目标用户</option>');
+								  }
+							}
+						});
+				};
+				//获取资产
+//				function money(x,y){
+//						$.ajax({
+//							type:"post",
+//							url:href+"ssh/assetList.web",
+//							data:{
+//								assetGroupId:x,
+//								ticket:newCookie
+//							},
+//							dataType:"json",
+//							success:function(data){
+//								  var d=data.data;
+//								  var otr="";
+//								  if(d.length){
+//								  	for(var i=0;i<d.length;i++){
+//								  		otr += '<option data-type="'+d[i].assetId+'">'+d[i].assetName+'</option>';
+//								  	};
+//								  	$("#m-fen2").html('<option data-type="">请选择资产</option>'+otr);
+//								  	$("#m-fen2 option[data-type='"+ y +"']").prop("selected", true);
+//								  }
+//							}
+//						});
+//				};
+				//获取资产下得目标用户
+				function userlist(x,y){
+						$.ajax({
+							type:"post",
+							url:href+"ssh/dstList.web",
+							data:{
+								assetGroupId:x,
+								ticket:newCookie
+							},
+							dataType:"json",
+							success:function(data){
+								  var d=data.data;
+								  var otr="";
+								  if(d.length){
+								  	for(var i=0;i<d.length;i++){
+								  		otr += '<option data-type="'+d[i].dstId+'" data-id="'+d[i].assetId+'">'+d[i].dstName+'</option>';
+								  	};
+								  	$("#m-fen3").html('<option data-type="">请选择目标用户</option>'+otr);
+								  	$("#m-fen3 option[data-type='"+ y +"']").prop("selected", true);
+								  }
+							}
+						});
+				};
+		      //监听资产组得变化
+		      $('#m-fen11').on('change',function (event) {
+		     	event.preventDefault();
+		     	var id=$('#m-fen11 option:selected').data('type');
+		     	if(id==""){
+		     		//$("#m-fen2").html('<option data-type="">请选择资产</option>');
+				    $("#m-fen3").html('<option data-type="">请选择目标用户</option>');
+		     	}else{
+		     		userlist(id,"");
+		     	    //$("#m-fen3").html('<option data-type="">请选择目标用户</option>');
+		     	}
+		     });
+		     //监听资产得变化
+//		      $('#m-fen2').on('change',function (event) {
+//		     	event.preventDefault();
+//		     	var id=$('#m-fen2 option:selected').data('type');
+//		     	if(id==""){
+//		     		$("#m-fen3").html('<option data-type="">请选择目标用户</option>');
+//		     	}else{
+//		     		userlist(id,"");
+//		     	}
+//		     });
+		     $("#tjia").on("click",function(event){
+		     	event.preventDefault();
+		     	var zuname=$('#m-fen11 option:selected').val();
+		     	var zuid=$('#m-fen11 option:selected').data('type');
+				var zcid=$('#m-fen3 option:selected').data('id');
+//		     	var mname=$('#m-fen2 option:selected').val();
+//		     	var mid=$('#m-fen2 option:selected').data('type');
+		     	var yhu=$('#m-fen3 option:selected').val();
+		     	// 用户id
+				var yid=$('#m-fen3 option:selected').data('type');
+		     	var squan=$('#m-fen4 option:selected').val();
+		     	var sid=$('#m-fen4 option:selected').data('type');
+		     	if(zuid==""){
+		     		alert(zuname);
+		     		return;
+		     	};
+//		     	if(mid==""){
+//		     		alert(mname);
+//		     		return;
+//		     	};
+		     	if(yid==""){
+		     		alert(yhu);
+		     		return;
+		     	};
+		     	if($(".zuid").length>=1){
+		     		alert("资产组只能选择一个");
+		     		return;
+//		     		for(var i=0;i<$(".zuid").length;i++){
+//		     			if(zuid==$(".zuid").eq(i).attr("data-id")){
+//		     					alert("资产组只能选择一个");
+//		     					return;
+//		     			}
+//		     		}
+		     	}
+		     	var otr = '<tr style="text-align:center"><td class="zuid" data-id="'+zuid+'">'+zuname+'</td><td data-id="'+yid+'" class="yid" data-type="'+zcid+'">'+yhu+'</td><td data-id="'+sid+'" class="sid">'+squan+'</td><td><img src="../common/image/shanchu.png"  class="srov" style="cursor: pointer;" alt="" /></td></tr>'
+		        $(".xTable tbody").append(otr);
+		     });
+		     //删除目标用户
+	     	$(document).delegate('.srov', 'click', function(event) {
+	     		event.preventDefault();
+	     		$(this).parent().parent().remove()
+	     	});
+		</script>
+	</body>
+</html>

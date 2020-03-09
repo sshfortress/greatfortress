@@ -1,0 +1,782 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>仪表盘</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link rel="stylesheet" href="../common/layui/css/layui.css" />
+		<link rel="stylesheet" href="../common/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="../common/css/bootstrap-datetimepicker.min.css" />
+		<style>
+			*{ margin:0; padding:0; list-style:none;}
+			a{ text-decoration:none;}
+			a:hover{ text-decoration:none;}
+			.tcdPageCode{padding: 15px 20px;text-align: left;color: #ccc;text-align:center;}
+			.tcdPageCode a{display: inline-block;color: #428bca;display: inline-block;height: 25px;	line-height: 25px;	padding: 0 10px;border: 1px solid #ddd;	margin: 0 2px;border-radius: 4px;vertical-align: middle;}
+			.tcdPageCode a:hover{text-decoration: none;border: 1px solid #428bca;}
+			.tcdPageCode span.current{display: inline-block;height: 25px;line-height: 25px;padding: 0 10px;margin: 0 2px;color: #fff;background-color: #428bca;	border: 1px solid #428bca;border-radius: 4px;vertical-align: middle;}
+			.tcdPageCode span.disabled{	display: inline-block;height: 25px;line-height: 25px;padding: 0 10px;margin: 0 2px;	color: #bfbfbf;background: #f2f2f2;border: 1px solid #bfbfbf;border-radius: 4px;vertical-align: middle;}
+		    .xia:hover{
+		    	text-decoration: underline;
+		    }
+		    #chart-panel div{
+		    	overflow: auto!important;
+		    }
+		    /*canvas{
+		    	display:inline-block;
+		    	width:100%;
+		    }*/
+		</style>
+	</head>
+	<body>
+		<script>
+			
+		</script>
+		<!--<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;border: none;border-bottom: 1px solid #666;">
+			<legend style="border:none">仪表盘
+			<div class="form-group" style="float:right;margin-right:30px;">
+					<img src="../common/image/shuaxin.jpg" class="shua" alt="" />
+				</div>
+				<br />
+			</legend>
+		</fieldset>-->
+		<form id="search" class="form-inline clearfix" style="padding: 0;">
+			<div id="chart-panel" style="width:100%;height:600px;position:relative;padding:0;background: #404A59;right:0;" _echarts_instance_="ec_1508897649722">
+			
+		    </div>
+		    <table id="biuuu_city_list" class="layui-table" style="width:200px;position: absolute;top:100px;right:10px;border: 0;">
+			<thead>
+				<tr>
+					<!--<th style="text-align: center;">主机总数</th>
+					<th style="text-align: center;">在线用户</th>
+					<th style="text-align: center;">已连接服务器</th>-->
+				</tr>
+			</thead>
+			<tbody style="text-align: center;color: #4bffff;">
+				<tr style="background: #000;border: none;opacity: 0.5;">
+					<td style="border: none;">Host number</td>
+					<td style="border: none;" class="ht"></td>
+				</tr>
+				<tr style="background: #000;opacity: 0.5;">
+					<td style="border: none;">Online user</td>
+					<td style="border: none;" class="olin"></td>
+				</tr>
+				<!--<tr style="background: #404A59;opacity: 0.5;">
+					<td style="border: none;">Connecting server</td>
+					<td style="border: none;">2</td>
+				</tr>-->
+			</tbody>
+			</table>
+			<table id="biuuu_city_list2" class="layui-table" style="width:300px;position: absolute;top:250px;right:10px;border: 0;">
+			<thead>
+				<tr style="text-align: center;color: #65addb;background: #223333;opacity: 0.5;">
+					<th style="border: none;color:#4bffff">TIMESTAMP</th>
+					<th style="border: none;color:#4bffff">ATTACKER IP</th>
+				</tr>
+			</thead>
+			<tbody class="ti">
+				<!--<tr style="text-align: center;color: #65addb;background: #223333;opacity: 0.5;">
+					<td style="border: none;color:#4bffff">Host number</td>
+					<td style="border: none;color:#4bffff">2</td>
+				</tr>
+				<tr style="text-align: center;color: #65addb;background: #223333;opacity: 0.5;">
+					<td style="border: none;color:#4bffff">Host number</td>
+					<td style="border: none;color:#4bffff">2</td>
+				</tr>
+				<tr style="text-align: center;color: #65addb;background: #223333;opacity: 0.5;">
+					<td style="border: none;color:#4bffff">Host number</td>
+					<td style="border: none;color:#4bffff">2</td>
+				</tr>-->
+				<!--<tr style="background: #404A59;opacity: 0.5;">
+					<td style="border: none;">Connecting server</td>
+					<td style="border: none;">2</td>
+				</tr>-->
+			</tbody>
+			</table>
+			<div class="form-inline clearfix" style="position: absolute;top:30px;right:10px;">
+			     <div class="form-group">
+					<input type="text" value="" class="form-control checkLogs" id="addTime1" style="background: #000;border: none;color: #fff;width: 100px;opacity: 0.5;" placeholder="Start time" autocomplete="off">
+				 </div>
+				<div class="form-group">
+					<input type="text" value="" class="form-control checkLogs" id="endTime" style="background: #000;border: none;color:#fff;width: 100px;opacity: 0.5"  placeholder="End time" autocomplete="off">
+				</div>&nbsp;&nbsp;&nbsp;
+				<a href="javascript:void(0)" id="j-search" class="btn btn-primary active" style="background:#000;color:#999;opacity: 0.5" role="button">Filter</a>
+		   </div>
+		<div style="margin-top:40px" class="text-center">
+			<div class="form-group" style="height:330px">
+				<h2 style="padding-left: 15px;">
+					TOP5
+				</h2>
+				<!--<p style="padding-left: 15px;">
+					过去一周共有1位用户登录248次服务器.
+				</p>-->
+				<ul class="list-group tops" style="border:none">
+				    <!--<li class="list-group-item" style="height:40px;border:none;border-bottom:1px solid #000;">
+				    	<span class="pull-left">1 adminadminadmin</span>&nbsp;&nbsp;
+				    	<span class="pull-right">5次/周5次/周</span>
+				    </li>
+				     <li class="list-group-item" style="height:40px;border:none;border-bottom: 1px solid #ddd;">
+				    	<span class="pull-left">2 admin</span>
+				    	<span class="pull-right">5次/周</span>
+				    </li>
+				     <li class="list-group-item" style="height:40px;border:none">
+				    	<span class="pull-left">admin</span>
+				    	<span class="pull-right">5次/周</span>
+				    </li>
+				      <li class="list-group-item" style="height:40px;border:none">
+				    	<span class="pull-left">admin</span>
+				    	<span class="pull-right">5次/周</span>
+				    </li>
+				      <li class="list-group-item" style="height:40px;border:none">
+				    	<span class="pull-left">admin</span>
+				    	<span class="pull-right">5次/周</span>
+				    </li>-->
+				    
+			 </ul>
+			</div>
+			<div class="form-group">
+				<div id="main" style="width:820px;height:300px;">
+					
+				</div>
+			</div>	
+		</div>
+			
+				
+		</form>
+		<script src="../common/js/jquery-1.12.3.min.js"></script>
+		<script type="text/javascript" src="../common/layui/layui.js"></script>
+		<script src="../common/layui/lay/modules/laydate.js"></script>
+		<script src='../common/layui/lay/modules/laypage.js'></script>
+		<script src="../common/js/bootstrap.min.js"></script>
+		<script src="../common/js/jquery.bootstrap.min.js"></script>
+		<script src="../common/js/search-logs.js"></script>
+		<script src="../common/js/jquery.page.js"></script>
+		<script src="../common/js/echarts.min.js"></script>
+		<!--<script src="dep/echarts/map/js/china.js"></script>-->
+		 <script src="js/word.js"></script>
+		 <script src="../common/js/bootstrap-datetimepicker.min.js"></script>
+		<script src="../common/js/bootstrap-datetimepicker.zh-CN.js"></script>
+		<script>
+			var newCookie=sessionStorage.ticket;
+		 //刷新
+		 $(".shua").on("click",function(event){
+		 	event.preventDefault();
+		 	window.location.href="mySave.html";
+		 });
+		   //入学时间
+		  $('#addTime1').datetimepicker({
+			        format: 'yyyy-mm-dd',
+			        language:  'zh-CN',
+			        autoclose: 1,
+			        minView: 2
+	    });
+	    //结业时间
+	    $('#endTime').datetimepicker({
+			        format: 'yyyy-mm-dd',
+			        language:  'zh-CN',
+			        autoclose: 1,
+			        minView: 2
+	    });
+	    //获取top5
+	    $.ajax({
+	    	type:"post",
+	    	url:href+"common/top5.do",
+	    	data:{
+	    		ticket:newCookie	
+	    	},
+	    	dataType:"json",
+	    	success:function(data){
+	    		var d=data.data;
+	    		if(d.length){
+	    			var otr=""
+	    			for(var i=0;i<d.length;i++){
+	    				otr += '<li class="list-group-item" style="height:40px;border:none;width:220px">'
+				    	otr += '<span class="pull-left">'+d[i].sshName+'</span>'
+				    	otr += '<span class="pull-right">'+d[i].loginNumber+'次/周</span></li>'
+	    			};
+	    			$(".tops").html(otr);
+	    		}else{
+	    			$(".tops").html("");
+	    		}
+	    	}
+	    })
+	    
+		 var myChart = echarts.init(document.getElementById('main'));
+		 //获取月度访问量
+		 $.ajax({
+		 	type:"post",
+		 	url:href+"common/month.do",
+		 	data:{
+		 		ticket:newCookie
+		 	},
+		 	dataType:"json",
+		 	success:function(data){
+		 		var d=data.data;
+		 		var name=d.x;
+		 		var value=d.y;
+		 		option = {
+				    title: {
+				        text: '月数据总览',
+				        subtext:"一个月内历史总汇",
+				        x:"center"
+				    },
+				    tooltip : {
+				        trigger: 'axis',
+				        axisPointer: {
+				            type: 'cross',
+				            label: {
+				                backgroundColor: '#9933CC'
+				            }
+				        }
+				    },
+				    toolbox: {
+				        feature: {
+				            saveAsImage: {}
+				        }
+				    },
+				    grid: {
+				        left: '3%',
+				        right: '4%',
+				        bottom: '20%',
+				        containLabel: true
+				    },
+				    dataZoom: [
+					        {
+					            show: true,
+					            realtime: true,
+					            start: 0,
+		                        end: 80
+					        }
+					    ],
+				    xAxis : [
+				        {
+				            type : 'category',
+				            boundaryGap : false,
+				            show:true,
+				            splitLine: {
+				               show:'true',
+							   lineStyle: {
+				                type: 'solid'
+				               }
+							},
+				            data : name
+				        }
+				    ],
+				    yAxis : [
+				        {
+				            type : 'value',
+				            show:true,
+				            splitLine: {
+							   lineStyle: {
+				                type: 'solid',
+				               }
+							}
+				        }
+				    ],
+				    series : [
+				        {
+				            name:'登录',
+				            type:'line',
+				            stack: '总量',
+				            areaStyle: {normal: {
+				            	
+				            }},
+				             itemStyle:{
+				                  normal:{color:'#9933CC'}
+				             },
+				            data:value
+				        }
+				    ]
+				};
+		        myChart.setOption(option);
+		 	}
+		 })
+					
+		       
+
+			
+function randomData() {
+    return Math.round(Math.random()*1000);
+};
+var myCharts1 = document.getElementById('chart-panel');		 
+//var myCharts = echarts.init(document.getElementById('chart-panel'));
+//用于使chart自适应高度和宽度,通过窗体高宽计算容器高宽
+var resizeWorldMapContainer = function () {
+    myCharts1.style.width = window.innerWidth+'px';
+    //myCharts.style.height = window.innerHeight+'px';
+};
+//设置容器高宽
+resizeWorldMapContainer();
+var myCharts = echarts.init(document.getElementById('chart-panel'));
+//默认地图展示
+function maps(x,y){
+	$.ajax({
+		type:"get",
+		url:href+"dstipWeb/addDstIpLogin.do",
+		data:{
+		  minTime:x,
+		  maxTime:y,
+		  ticket:newCookie	
+		},
+		dataType:"json",
+		success:function(data){
+			var d=data.data;
+		var	geoCoordMap=d.geoCoord;
+		 $(".ht").text(d.hostNumber);
+		$(".olin").text(d.onlineUser);
+      	//console.log(geoCoordMap);
+      	var BJData=d.mm;
+      	var dd=d.newIPList;
+      	if(dd.length){
+      		var otr=""
+      		for(var i=0;i<dd.length;i++){
+      			if(dd[i].loginStatus==0){
+      				otr += '<tr style="text-align: center;color: #65addb;background: #223333;opacity: 0.5;">'
+					otr += '<td style="border: none;color:red;font-weight:700">'+dd[i].createTime+'</td>'
+					otr += '<td style="border: none;color:red;font-weight:700">'+dd[i].IP+'</td>'
+					otr += '</tr>';
+      			}else{
+      				otr += '<tr style="text-align: center;color: #65addb;background: #223333;opacity: 0.5;">'
+					otr += '<td style="border: none;color:#4bffff">'+dd[i].createTime+'</td>'
+					otr += '<td style="border: none;color:#4bffff">'+dd[i].IP+'</td>'
+					otr += '</tr>';
+      			}
+      			
+      		};
+      		$(".ti").html(otr);
+      	}else{
+      		$(".ti").html('');
+      	}
+      	//console.log(BJData);
+      	//alert(geoCoordMap);
+      	//alert(BJData);
+      	var convertData = function(data) {
+			    var res = [];
+			    for (var i = 0; i < data.length; i++) {
+			        var dataItem = data[i];
+			       // console.log("我是"+dataItem[0].value)
+			        var fromCoord = geoCoordMap[dataItem[0].name];
+			        var toCoord = geoCoordMap[dataItem[1].name];
+			        if (fromCoord && toCoord) {
+			            res.push([{
+			                coord: fromCoord,
+			                value: dataItem[0].value
+			            }, {
+			                coord: toCoord,
+			            }]);
+			        }
+			    }
+			    return res;
+			};
+			var color = ['#a6c84c', '#ffa022', '#46bee9'];
+			var series = [];
+			var color = ['#a6c84c'];
+		[
+			    ['Hangzhou', BJData]
+			].forEach(function(item, i) {
+			    series.push(
+			    	 {
+			            type: 'lines',
+			            zlevel: 2,
+			            effect: {
+			                show: true,
+			                period: 4,
+			                trailLength: 0.02,
+			                symbol: 'arrow',
+			                symbolSize: 5
+			            },
+			            lineStyle: {
+			                normal: {
+			                    width: 1,
+			                    opacity: 0.6,
+			                    curveness: 0.2
+			                }
+			            },
+			
+			            data: convertData(item[1])
+			        },
+			
+			      {
+			            type: 'effectScatter',
+			            coordinateSystem: 'geo',
+			            zlevel: 2,
+			            rippleEffect: {
+			                period: 4,
+			                brushType: 'stroke',
+			                scale: 5 //外围圈，
+			            },
+			            label: {
+			                normal: {
+			                    show: true,
+			                    position: 'right',
+			                    offset: [5, 0],
+			                    formatter: '{b}'
+			                },
+			                emphasis: {
+			                    show: true
+			                }
+			            },
+			            symbol: 'circle',
+			            symbolSize: function(val) {  //点的大小
+			                return 4 + val[2] / 100; 
+			            },
+			            itemStyle: {
+			                normal: {
+			                    show: false,
+			                    color: '#f00',
+			                }
+			            },
+			            data: item[1].map(function(dataItem) {
+			                return {
+			                    name: dataItem[0].name,
+			                    value: geoCoordMap[dataItem[0].name].concat([dataItem[0].value])
+			                };
+			            }),
+			        },
+			       //被攻击点
+			        {
+			            type: 'scatter',
+			            coordinateSystem: 'geo',
+			            zlevel: 2,
+			            rippleEffect: {
+			                period: 4,
+			                brushType: 'stroke',
+			                scale: 4
+			            },
+			            label: {
+			                normal: {
+			                    show: true,
+			                    position: 'right',
+			                    //			                offset:[5, 0],
+			
+			                    color: '#00ffff',
+			                    formatter: '{b}',
+			                    textStyle: {
+			                        color: "#00ffff"
+			                    }
+			                },
+			                emphasis: {
+			                    show: true
+			                }
+			            },
+			            symbol: 'pin',
+			            symbolSize: 30,
+			            itemStyle: {
+			                normal: {
+			                    show: true,
+			                    color: '#9966cc',
+			                }
+			            },
+			            data: [{
+			                name: item[0],
+			                value: geoCoordMap[item[0]].concat([d.hzNumber]),
+			            }],
+			        }
+			    );
+			});
+			
+			options = {
+			    backgroundColor: '#000',
+			     title : {
+			        text: '',
+			        left: 'center',
+			        top: '5%',
+			        textStyle: {
+			            color: '#fff',
+			        }
+			    },
+			     tooltip : {
+			        trigger: 'item',
+			        formatter : function (params) {
+			        	console.log(params)
+			            var value = (params.value + '').split('.');
+			            var x=(value+"").split(",");
+			            var z=x.length;
+			            var y=x[z-1];
+			            if(y<0){
+			            	y=-y;
+			            }
+			//          value = value[0].replace(/(\d{1,3})(?=(?:\d{3})+(?!\d))/g, '$1,')
+			//                  + '.' + value[1];
+			            return  '登陆用户量：'+y;
+			        }
+			    },
+			    visualMap: {
+			        min:-1,
+			        max: 0,
+			        show:false,
+			        calculable: true,
+			        color: ['#03C526','#ff3333'],
+			        textStyle: {
+			            color: '#fff',
+			        }
+			    },
+			    geo: {
+			        map: 'world',
+			        label: {
+			            emphasis: {
+			                show: false
+			            }
+			        },
+			        roam: true,
+			        layoutCenter: ['50%', '52%'],
+			        layoutSize: "170%",
+			        itemStyle: {
+			            normal: {
+			                color: '#000',
+			                borderColor: '#3EBBBB'
+			            },
+			            emphasis: {
+			                color: 'rgba(37, 43, 61, .5)'
+			            }
+			        }
+			    },
+			    
+			
+			    series: series
+			};  
+			 myCharts.setOption(options); 
+			
+		}
+	});
+};
+maps("","");
+//根据时间过滤
+$("#j-search").on("click",function(event){
+	event.preventDefault();
+	var t1=$("#addTime1").val();
+	var t2=$("#endTime").val();
+	maps(t1,t2)
+});
+window.onresize = function () {
+    //重置容器高宽
+    resizeWorldMapContainer();
+    myCharts.resize();
+};	
+
+		//实时更新数据	
+      var ws = new WebSocket(ws+"myHandler?userId="+sessionStorage.roleId);
+      ws.onopen = function(){};
+      ws.onmessage = function(evt){
+      	var d=JSON.parse(evt.data);
+      	//alert("我是d"+d)
+       geoCoordMap=d.geoCoord;
+      	console.log(geoCoordMap);
+      	BJData=d.mm;
+      	console.log(BJData);
+      	var dd=d.newIPList;
+      	if(dd.length){
+      		var otr=""
+      		for(var i=0;i<dd.length;i++){
+      			if(dd[i].loginStatus==0){
+      				otr += '<tr style="text-align: center;color: #65addb;background: #223333;opacity: 0.5;">'
+					otr += '<td style="border: none;color:red;font-weight:700">'+dd[i].createTime+'</td>'
+					otr += '<td style="border: none;color:red;font-weight:700">'+dd[i].IP+'</td>'
+					otr += '</tr>';
+      			}else{
+      				otr += '<tr style="text-align: center;color: #65addb;background: #223333;opacity: 0.5;">'
+					otr += '<td style="border: none;color:#4bffff">'+dd[i].createTime+'</td>'
+					otr += '<td style="border: none;color:#4bffff">'+dd[i].IP+'</td>'
+					otr += '</tr>';
+      			}
+      			
+      		};
+      		$(".ti").html(otr);
+      	}else{
+      		$(".ti").html('');
+      	}
+      	//alert(geoCoordMap);
+      	//alert(BJData);
+      	var convertData = function(data) {
+			    var res = [];
+			    for (var i = 0; i < data.length; i++) {
+			        var dataItem = data[i];
+			       // console.log("我是"+dataItem[0].value)
+			        var fromCoord = geoCoordMap[dataItem[0].name];
+			        var toCoord = geoCoordMap[dataItem[1].name];
+			        if (fromCoord && toCoord) {
+			            res.push([{
+			                coord: fromCoord,
+			                value: dataItem[0].value
+			            }, {
+			                coord: toCoord,
+			            }]);
+			        }
+			    }
+			    return res;
+			};
+			var color = ['#a6c84c', '#ffa022', '#46bee9'];
+			var series = [];
+			var color = ['#a6c84c'];
+		[
+			    ['Hangzhou', BJData]
+			].forEach(function(item, i) {
+			    series.push(
+			    	 {
+			            type: 'lines',
+			            zlevel: 2,
+			            effect: {
+			                show: true,
+			                period: 4,
+			                trailLength: 0.02,
+			                symbol: 'arrow',
+			                symbolSize: 5
+			            },
+			            lineStyle: {
+			                normal: {
+			                    width: 1,
+			                    opacity: 0.6,
+			                    curveness: 0.2
+			                }
+			            },
+			
+			            data: convertData(item[1])
+			        },
+			
+			      {
+			            type: 'effectScatter',
+			            coordinateSystem: 'geo',
+			            zlevel: 2,
+			            rippleEffect: {
+			                period: 4,
+			                brushType: 'stroke',
+			                scale: 5 //外围圈，
+			            },
+			            label: {
+			                normal: {
+			                    show: true,
+			                    position: 'right',
+			                    offset: [5, 0],
+			                    formatter: '{b}'
+			                },
+			                emphasis: {
+			                    show: true
+			                }
+			            },
+			            symbol: 'circle',
+			            symbolSize: function(val) {  //点的大小
+			                return 4 + val[2] / 100; 
+			            },
+			            itemStyle: {
+			                normal: {
+			                    show: false,
+			                    color: '#f00',
+			                }
+			            },
+			            data: item[1].map(function(dataItem) {
+			                return {
+			                    name: dataItem[0].name,
+			                    value: geoCoordMap[dataItem[0].name].concat([dataItem[0].value])
+			                };
+			            }),
+			        },
+			       //被攻击点
+			        {
+			            type: 'scatter',
+			            coordinateSystem: 'geo',
+			            zlevel: 2,
+			            rippleEffect: {
+			                period: 4,
+			                brushType: 'stroke',
+			                scale: 4
+			            },
+			            label: {
+			                normal: {
+			                    show: true,
+			                    position: 'right',
+			                    //			                offset:[5, 0],
+			
+			                    color: '#00ffff',
+			                    formatter: '{b}',
+			                    textStyle: {
+			                        color: "#00ffff"
+			                    }
+			                },
+			                emphasis: {
+			                    show: true
+			                }
+			            },
+			            symbol: 'pin',
+			            symbolSize: 30,
+			            itemStyle: {
+			                normal: {
+			                    show: true,
+			                    color: '#9966cc',
+			                }
+			            },
+			            data: [{
+			                name: item[0],
+			                value: geoCoordMap[item[0]].concat([d.hzNumber]),
+			            }],
+			        }
+			    );
+			});
+			
+			options = {
+			    backgroundColor: '#000',
+			     title : {
+			        text: '',
+			        left: 'center',
+			        top: '5%',
+			        textStyle: {
+			            color: '#fff',
+			        }
+			    },
+			     tooltip : {
+			        trigger: 'item',
+			        formatter : function (params) {
+			        	console.log(params)
+			            var value = (params.value + '').split('.');
+			            var x=(value+"").split(",");
+			            var z=x.length;
+			            var y=x[z-1];
+			            if(y<0){
+			            	y=-y;
+			            }
+			//          value = value[0].replace(/(\d{1,3})(?=(?:\d{3})+(?!\d))/g, '$1,')
+			//                  + '.' + value[1];
+			            return  '登陆用户量：'+y;
+			        }
+			    },
+			    visualMap: {
+			        min:-1,
+			        max: 0,
+			        show:false,
+			        calculable: true,
+			        color: ['#03C526','#ff3333'],
+			        textStyle: {
+			            color: '#fff',
+			        }
+			    },
+			    geo: {
+			        map: 'world',
+			        label: {
+			            emphasis: {
+			                show: false
+			            }
+			        },
+			        roam: true,
+			        layoutCenter: ['50%', '52%'],
+			        layoutSize: "170%",
+			        itemStyle: {
+			            normal: {
+			                color: '#000',
+			                borderColor: '#3EBBBB'
+			            },
+			            emphasis: {
+			                color: 'rgba(37, 43, 61, .5)'
+			            }
+			        }
+			    },
+			    
+			
+			    series: series
+			};  
+			 myCharts.setOption(options);  
+      	};
+      ws.onerror = function(evt){console.log("WebSocketError!");};
+		</script>
+	</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>快照</title>
+	</head>
+	<body>
+		
+	</body>
+	<script src="../common/js/jquery-1.12.3.min.js"></script>
+	<script type="text/javascript" src="../common/layui/layui.js"></script>
+	<script>
+		(function ($) {
+		            $.getUrlParam = function (name) {
+		                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+		                var r = window.location.search.substr(1).match(reg);
+		                if (r != null) return unescape(r[2]); return null;
+		            }
+		        })(jQuery);
+		      var newCookie=sessionStorage.ticket;
+		        var mdf=$.getUrlParam('mdf');
+		       $.ajax({
+				type: "post",
+				url: href+"monitor/getSnapshotHtml.web",
+				data: {
+					mdf:mdf,
+					fromType:sessionStorage.type,
+					ticket:newCookie
+				},
+				dataType:"json",
+				success: function(data) {
+					//console.log(data)
+					if(data.status==100){
+					$("body").html(data.data);
+					return;
+					}else{
+					  alert(data.showMessage);
+					  return;
+					}
+				}
+			});
+	</script>
+</html>
