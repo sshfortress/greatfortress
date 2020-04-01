@@ -398,10 +398,8 @@ Lay.fn.event = function(modName, events, params){
 win.layui = new Lay();
 
 }(window);
-//var href="http://192.168.18.8/greatfortressframework/";
-//var ws="ws://192.168.18.8/greatfortressframework/";
-var href="http://192.168.7.110:8080/greatfortressframework/";
-var ws="ws://192.168.7.110:8080/greatfortressframework/";
+var href="http://192.168.7.3:8080/greatfortressframework/";
+var ws="ws://192.168.7.3:8080/greatfortressframework/";
 
 
 
