@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="lib/jqui/jquery-ui.min.css">
+    <link rel="stylesheet" href="lib/jqui/jquery-ui.theme.min.css">
+    <link rel="stylesheet" href="lib/application.css">
+    <script src="lib/jquery.min.js"></script>
+    <script src="lib/jqui/jquery-ui.min.js"></script>
+    <script src="lib/jquery.fullscreen-min.js"></script>
+    <script src="lib/term.js"></script>
+    <script src="lib/showterm.js"></script>
+    <script src="src/script.js"></script>
+</head>
+<body>
+
+<ul>
+    <li><a href="#console">console <span id="replayTitle"></span></a></li>
+    <li><a href="#loadPair">load a typescript+timings pair</a></li>
+	
+    <li><a href="#loadJson">load packed json file</a></li>
+	<!--
+    <li><a href="#loadServerJson">load packed json from server</a></li>
+	-->
+</ul>
+
+<div id="console">console</div>
+
+<div id="loadPair">
+    <form action="javascript:void 0">
+        <table>
+            <tr>
+                <td>typescript file:</td>
+				<
+                <td><input type="file" id="clientFile"></td>
+                <td colspan="2">generate using
+                    <pre>&gt; script -t 2>TimingFileName -a typeScriptFileName</pre>
+                </td>
+
+            </tr>
+            <tr>
+                <td>timing file:</td>
+                <td><input type="file" id="clientTimingFile"></td>
+            </tr>
+            <tr>
+                <td>terminal width:</td>
+                <td><input id="termWidth" placeholder="default 80"></td>
+                <td>record file location <pre>&gt; /var/log/sshfortress_playback</pre></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <input type="submit" value="show"/>
+                    <button id="makeAJson">generate json package</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+<div id="loadJson">
+    <form action="javascript:void 0">
+        <table>
+            <tr>
+                <td>select json package file:</td>
+                <td><input type="file" id="jsonFile"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><input type="submit" value="show"/></td>
+            </tr>
+        </table>
+    </form>
+</div>
+<!--
+<div id="loadServerJson">
+    <form action="javascript:void 0">
+        <table>
+            <tr>
+                <td>open from server data folder</td>
+                <td><input type="text" id="serverFile" placeholder="type 'example'"/></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><input type="submit" value="show"/></td>
+            </tr>
+        </table>
+    </form>
+</div>
+-->
+</body>
+</html>

@@ -1,0 +1,77 @@
+/**
+ * initially taken from https://github.com/ConradIrwin/showterm.io
+ * license at a time: https://github.com/ConradIrwin/showterm.io/blob/dd8791b2b6162b277d65b77574fdf9f282b01509/LICENSE.MIT
+ */
+
+h2 {
+    margin-top: 40px;
+}
+
+.logo {
+    font-weight: bold;
+}
+
+.logo:before {
+    content: "$://";
+    color: #0087d7;
+    font-weight: bold;
+    letter-spacing: -0.2em;
+    margin-right: 0.1em;
+}
+
+.mainpage {
+    width: 660px;
+    margin:auto;
+    color: rgb(255, 248, 236)
+}
+
+li:before {
+    color: #0087d7;
+}
+
+nav {
+    margin-top: 40px;
+    margin-bottom: 30px;
+}
+
+#example {
+    width: 660px;
+    height: 360px;
+    border: 1px solid #444;
+    position: relative;
+}
+
+body {
+    background: black;
+    color: white;
+    margin: 0;
+    padding: 0;
+    font-family: monospace !important;
+    white-space: nowrap;
+
+}
+
+.mainpage {
+    white-space: normal;
+}
+
+div.terminal {
+    line-height: 120%;
+}
+
+.terminal-cursor {
+    background: rgba(255, 255, 255, 0.4)
+}
+
+h1 {
+    color: white;
+}
+
+a {
+    color: white;
+}
+
+#console {
+    min-height: 40ex;
+    height: 80%;
+}

@@ -1,16 +1,3 @@
-/*!
-
- @Title: Layui
- @Description：经典模块化前端框架
- @Site: www.layui.com
- @Author: 贤心
- @License：LGPL
-
- */
- 
-//开头的分号，意在防止与其他js文件合并压缩时，由于上一个文件没有用分号结尾而产生问题
-//常见的(多了一对括号),调用匿名函数:(function() {})()
-//另外一种!function(){}()前面加上一个布尔运算符（只多了一个感叹号），就是表达式了，将执行后面的代码，也就合法实现调用
 ;!function(win){
 
 "use strict";//严格模式
@@ -411,9 +398,10 @@ Lay.fn.event = function(modName, events, params){
 win.layui = new Lay();
 
 }(window);
-
-var href="http://192.168.7.3:8080/greatfortressframework/";
-var ws="ws://192.168.7.3:8080/greatfortressframework/";
+//var href="http://192.168.18.8/greatfortressframework/";
+//var ws="ws://192.168.18.8/greatfortressframework/";
+var href="http://192.168.7.110:8080/greatfortressframework/";
+var ws="ws://192.168.7.110:8080/greatfortressframework/";
 
 
 
