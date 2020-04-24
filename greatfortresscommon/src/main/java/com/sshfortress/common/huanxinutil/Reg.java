@@ -6,27 +6,6 @@ import java.util.List;
 
 public class Reg {
 	
-//	{
-//		  "action": "post",
-//		  "application": "4e725a30-676e-11e7-9676-efea1f1d9655",
-//		  "path": "/users",
-//		  "uri": "https://a1.easemob.com/1144170713115876/test/users",
-//		  "entities": [
-//		    {
-//		      "uuid": "b6715b10-677b-11e7-b9d4-f903d66c0788",
-//		      "type": "user",
-//		      "created": 1499916669761,
-//		      "modified": 1499916669761,
-//		      "username": "a123",
-//		      "activated": true,
-//		      "nickname": "ccccccc"
-//		    }
-//		  ],
-//		  "timestamp": 1499916669767,
-//		  "duration": 0,
-//		  "organization": "1144170713115876",
-//		  "applicationName": "test"
-//		}
 	private String action;
 	private String application;
 	private String path;
