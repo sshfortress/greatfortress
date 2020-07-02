@@ -1,1 +1,3 @@
 # greatfortress
+
+ mvn clean package
