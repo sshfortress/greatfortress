@@ -1,5 +1,5 @@
 # greatfortress
 ```
- mvn clean package
+ mvn clean package -DskipTests
 ```
 sshfortress webside code
